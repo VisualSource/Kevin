@@ -1,0 +1,494 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1588100208.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"name",
+		"class",
+		"type",
+		"ratiry",
+		"special",
+		"visual",
+		"attack",
+		"health",
+		"abilities",
+		"description",
+		"placement_settings",
+		"deck_settings"
+	],
+	"properties": {
+		"name": {
+			"$id": "#root/name", 
+			"title": "Name", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"Infantry"
+			],
+			"pattern": "^.*$"
+		},
+		"class": {
+			"$id": "#root/class", 
+			"title": "Class", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"Warrior"
+			],
+			"pattern": "^.*$"
+		},
+		"type": {
+			"$id": "#root/type", 
+			"title": "Type", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"Creature"
+			],
+			"pattern": "^.*$"
+		},
+		"ratiry": {
+			"$id": "#root/ratiry", 
+			"title": "Ratiry", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"common"
+			],
+			"pattern": "^.*$"
+		},
+		"special": {
+			"$id": "#root/special", 
+			"title": "Special", 
+			"type": "boolean",
+			"examples": [
+				false
+			],
+			"default": true
+		},
+		"visual": {
+			"$id": "#root/visual", 
+			"title": "Visual", 
+			"type": "object",
+			"required": [
+				"front_texture",
+				"back_texture"
+			],
+			"properties": {
+				"front_texture": {
+					"$id": "#root/visual/front_texture", 
+					"title": "Front_texture", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"back_texture": {
+					"$id": "#root/visual/back_texture", 
+					"title": "Back_texture", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				}
+			}
+		}
+,
+		"attack": {
+			"$id": "#root/attack", 
+			"title": "Attack", 
+			"type": "object",
+			"required": [
+				"damage",
+				"mana_cost",
+				"can_attack_player",
+				"can_attack_cards",
+				"damage_type",
+				"attack_particle",
+				"sound_cue_attack"
+			],
+			"properties": {
+				"damage": {
+                	"description":"The damage inficted when attacking an enemy (or friendly card)",
+					"$id": "#root/attack/damage", 
+					"title": "Damage", 
+					"type": "integer",
+					"examples": [
+						1
+					],
+					"default": 0
+				},
+				"mana_cost": {
+                	"description":"Mana cost of attacking with this card",
+					"$id": "#root/attack/mana_cost", 
+					"title": "Mana_cost", 
+					"type": "integer",
+					"examples": [
+						0
+					],
+					"default": 0
+				},
+				"can_attack_player": {
+                	"description":"whether this card can attack players",
+					"$id": "#root/attack/can_attack_player", 
+					"title": "Can_attack_player", 
+					"type": "boolean",
+					"examples": [
+						true
+					],
+					"default": true
+				},
+				"can_attack_cards": {
+                	"description":"Whether this card can attack other cards",
+					"$id": "#root/attack/can_attack_cards", 
+					"title": "Can_attack_cards", 
+					"type": "boolean",
+					"examples": [
+						true
+					],
+					"default": true
+				},
+				"damage_type": {
+                	"description":"The type of damage influcted when attacking another card",
+					"$id": "#root/attack/damage_type", 
+					"title": "Damage_type", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"basic"
+					],
+					"pattern": "^.*$"
+				},
+				"attack_particle": {
+					"$id": "#root/attack/attack_particle", 
+					"title": "Attack_particle", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"sound_cue_attack": {
+					"$id": "#root/attack/sound_cue_attack", 
+					"title": "Sound_cue_attack", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				}
+			}
+		}
+,
+		"health": {
+			"$id": "#root/health", 
+			"title": "Health", 
+			"type": "object",
+			"required": [
+				"health",
+				"life_expectancy",
+				"death_particle",
+				"sound_cue_death"
+			],
+			"properties": {
+				"health": {
+                	"description":"Health is the damage this card can sustain before it is moved to the graveyard",
+					"$id": "#root/health/health", 
+					"title": "Health", 
+					"type": "integer",
+					"examples": [
+						1
+					],
+					"default": 0
+				},
+				"life_expectancy": {
+                	"description":"Number of player turns this card will remain in play. if 0 Life Expectancy will not be used",
+					"$id": "#root/health/life_expectancy", 
+					"title": "Life_expectancy", 
+					"type": "integer",
+					"examples": [
+						0
+					],
+					"default": 0
+				},
+				"death_particle": {
+					"$id": "#root/health/death_particle", 
+					"title": "Death_particle", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"sound_cue_death": {
+					"$id": "#root/health/sound_cue_death", 
+					"title": "Sound_cue_death", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				}
+			}
+		}
+,
+		"abilities": {
+			"$id": "#root/abilities", 
+			"title": "Abilities", 
+			"type": "array",
+			"default": [],
+			"items":{
+				"$id": "#root/abilities/items", 
+				"title": "Items", 
+				"type": "object",
+				"required": [
+					"type",
+					"ability_int",
+					"trigger",
+					"after_use_state",
+					"affecting_player",
+					"particle",
+					"sound_cue"
+				],
+				"properties": {
+					"type": {
+                    	"description":"The Ability which this card has been assigned",
+						"$id": "#root/abilities/items/type", 
+						"title": "Type", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							"none"
+						],
+						"pattern": "^.*$"
+					},
+					"ability_int": {
+                    	"description":"A int variable which can be used to determin a unique number of times an ability can be used.",
+						"$id": "#root/abilities/items/ability_int", 
+						"title": "Ability_int", 
+						"type": "integer",
+						"examples": [
+							0
+						],
+						"default": 0
+					},
+					"trigger": {
+                    	"description":"This determins how the ability is triggered within the game.",
+						"$id": "#root/abilities/items/trigger", 
+						"title": "Trigger", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							"none"
+						],
+						"pattern": "^.*$"
+					},
+					"after_use_state": {
+                    	"description":"Enabling Single Use will send this card to the graveyard after its ability has been used",
+						"$id": "#root/abilities/items/after_use_state", 
+						"title": "After_use_state", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							"remain_in_play",
+                            "single_use"
+						],
+						"pattern": "^.*$"
+					},
+					"affecting_player": {
+                    	"description":"Affecting player",
+						"$id": "#root/abilities/items/affecting_player", 
+						"title": "Affecting_player", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							"self"
+						],
+						"pattern": "^.*$"
+					},
+					"particle": {
+						"$id": "#root/abilities/items/particle", 
+						"title": "Particle", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							""
+						],
+						"pattern": "^.*$"
+					},
+					"sound_cue": {
+						"$id": "#root/abilities/items/sound_cue", 
+						"title": "Sound_cue", 
+						"type": "string",
+						"default": "",
+						"examples": [
+							""
+						],
+						"pattern": "^.*$"
+					}
+				}
+			}
+
+		},
+		"description": {
+			"$id": "#root/description", 
+			"title": "Description", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				""
+			],
+			"pattern": "^.*$"
+		},
+		"placement_settings": {
+			"$id": "#root/placement_settings", 
+			"title": "Placement_settings", 
+			"type": "object",
+			"required": [
+				"owner",
+				"mana_cost",
+				"entry_particle",
+				"sound_cue_entry"
+			],
+			"properties": {
+				"owner": {
+                	"description":"The card placements owner which it can be placed upon",
+					"$id": "#root/placement_settings/owner", 
+					"title": "Owner", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"self"
+					],
+					"pattern": "^.*$"
+				},
+				"mana_cost": {
+                	"description":"Mana cost for placing this card on the board",
+					"$id": "#root/placement_settings/mana_cost", 
+					"title": "Mana_cost", 
+					"type": "integer",
+					"examples": [
+						1
+					],
+					"default": 0
+				},
+				"entry_particle": {
+					"$id": "#root/placement_settings/entry_particle", 
+					"title": "Entry_particle", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				},
+				"sound_cue_entry": {
+					"$id": "#root/placement_settings/sound_cue_entry", 
+					"title": "Sound_cue_entry", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						""
+					],
+					"pattern": "^.*$"
+				}
+			}
+		}
+,
+		"deck_settings": {
+			"$id": "#root/deck_settings", 
+			"title": "Deck_settings", 
+			"type": "object",
+			"required": [
+				"unlocked",
+				"add_to_player_deck",
+				"max_num_in_deck",
+				"weight",
+				"screen_size"
+			],
+			"properties": {
+				"unlocked": {
+                	"description":"whether the card has been unlocked by the player",
+					"$id": "#root/deck_settings/unlocked", 
+					"title": "Unlocked", 
+					"type": "boolean",
+					"examples": [
+						true
+					],
+					"default": true
+				},
+				"add_to_player_deck": {
+                	"description":"Whether or not the card can be added to the player deck, or whether it is always spawned from another card or event",
+					"$id": "#root/deck_settings/add_to_player_deck", 
+					"title": "Add_to_player_deck", 
+					"type": "boolean",
+					"examples": [
+						true
+					],
+					"default": true
+				},
+				"max_num_in_deck": {
+                	"description":"how many of this card will be used in the deck",
+					"$id": "#root/deck_settings/max_num_in_deck", 
+					"title": "Max_num_in_deck", 
+					"type": "integer",
+					"examples": [
+						3
+					],
+					"default": 0
+				},
+				"weight": {
+                	"description":"Weight can be used to determin whether the card will be pushed further into the deck when shuffled. if 1 will not be used and it will be randomly placed within the deck by chance",
+					"$id": "#root/deck_settings/weight", 
+					"title": "Weight", 
+					"type": "integer",
+					"examples": [
+						0
+					],
+					"default": 0
+				},
+				"screen_size": {
+					"$id": "#root/deck_settings/screen_size", 
+					"title": "Screen_size", 
+					"type": "object",
+					"required": [
+						"x",
+						"y"
+					],
+					"properties": {
+						"x": {
+							"$id": "#root/deck_settings/screen_size/x", 
+							"title": "X", 
+							"type": "integer",
+							"examples": [
+								200
+							],
+							"default": 200
+						},
+						"y": {
+							"$id": "#root/deck_settings/screen_size/y", 
+							"title": "Y", 
+							"type": "integer",
+							"examples": [
+								280
+							],
+							"default": 280
+						}
+					}
+				}
+
+			}
+		}
+
+	}
+}
