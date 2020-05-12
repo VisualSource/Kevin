@@ -31,9 +31,9 @@
             },
             "abilities":[
                 {
-                    "type":"retaliation_damage",
+                    "type":"discard_cards_in_hand",
                     "ability_int": 1,
-                    "trigger": "takes_damage",
+                    "trigger": "on_drop",
                     "after_use_state":"remain_in_play",
                     "affecting_player":"self",
                     "partice":"",

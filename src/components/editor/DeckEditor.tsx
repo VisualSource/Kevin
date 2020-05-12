@@ -59,6 +59,7 @@ const test =  {
     }
 }
 export default function DeckEditor(){
+    document.title = "Kevin Online - Deck Editor";
     const [cards, setCards] = useState([test]);
     const [deck,setDeck] = useState([{id:0, amount: 1}]);
     const [cardCount, setCardCount] = useState<number>(0);

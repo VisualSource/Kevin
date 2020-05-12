@@ -1,6 +1,5 @@
 import {Scene} from 'phaser';
 import dragableCard from '../objects/cards/dragableCard';
-import BoardCard from '../objects/cards/boardCard';
 import CardGroup from '../objects/cards/CardGroup';
 import Hand from '../objects/Hand';
 import BoardObject from '../objects/Board';
@@ -78,6 +77,16 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
             }
         });
     }
+    /**
+     * Creates a new card at a given dropzone
+     *
+     * @param {KevinOnline.Owner} owner
+     * @param {KevinOnline.Objects.DropZone} dropZone
+     * @param {number} card_id
+     * @param {boolean} [active=true]
+     * @returns {KevinOnline.Objects.BoardCard}
+     * @memberof GameScene
+     */
     newCard(owner: KevinOnline.Owner, dropZone: KevinOnline.Objects.DropZone, card_id: number, active: boolean = true): KevinOnline.Objects.BoardCard{
         switch (owner) {
             case "self":{
@@ -88,6 +97,15 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
             }
         }
     }
+    /**
+     *  Crates a set number of cards from a given dropzone
+     *
+     * @param {KevinOnline.Owner} owner
+     * @param {number} card_id
+     * @param {number} zone_id
+     * @param {number} [amount=1]
+     * @memberof GameScene
+     */
     spawnCard(owner: KevinOnline.Owner, card_id:number, zone_id:number, amount: number = 1){
         switch (owner) {
             case "opponent":{

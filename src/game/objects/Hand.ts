@@ -67,8 +67,17 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         this.addCard(card); 
     }
     discardHand(){
-        this.getChildren().forEach(card=>{
-            this.removeCard(card as KevinOnline.Objects.DragableCard);
-        });
+        const cards = this.getChildren();
+        for (let i = 0; i < cards.length; i++) {
+            this.remove(cards[i], true, true);
+        }
+        setTimeout(()=>{
+            const cardsa = this.getChildren();
+            for (let i = 0; i < cardsa.length; i++) {
+                this.remove(cardsa[i], true, true);
+                this.init()
+            }
+        },3);
+        this.init();
     }
 }

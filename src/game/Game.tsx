@@ -6,8 +6,8 @@ import OpponentHander from './state/OpponentHander';
 const gameState = GameState.getInstance();
 export default class Game extends Component<{},{overlay: boolean}>{
     public gameElement = createRef<HTMLCanvasElement>()
-    constructor(){
-        super({});
+    constructor(props: any){
+        super(props);
         this.state = {
             overlay: false
         }

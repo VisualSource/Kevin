@@ -8,6 +8,7 @@ import Play from './Play';
 import Account from './Account';
 import Settings from './Settings';
 function MainMenu(){
+  document.title = "Kevin Online";
   return <div id="main-menu">
             <Sidenav activeTab={0}/>
          </div>

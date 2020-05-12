@@ -5,6 +5,7 @@ import {routeTo} from '../utils/history';
 import {Utils} from 'phaser';
 import QueryableWorker from '../game/state/OpponentHander';
 export default function Play(){
+    document.title = "Kevin Online - Play";
     return <div id="play">
         <main>
             <Button onClick={()=>{
