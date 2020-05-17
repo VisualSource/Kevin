@@ -8,6 +8,7 @@ export default class GameState{
     public opponentHandler: OpponentHandler = OpponentHandler.getInstance();
     self: any;
     opponent: any;
+    showOverlay: any;
     private turnOwner: "self" | "oppoent" = "self";
     static getInstance(): GameState{
         if(instance == null){
@@ -18,6 +19,7 @@ export default class GameState{
     constructor(){
         this.self = observe({health: 30, mana: 2000, turns: 0}); 
         this.opponent = observe({health: 30, mana: 1, turns: 0});
+        this.showOverlay = observe({show: false});
     }
     get selfProxy(){
         return this.self.proxy;

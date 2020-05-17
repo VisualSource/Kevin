@@ -87,7 +87,7 @@ export default function DeckEditor(){
             <div id="card-selection">
                 <section id="finder">
                     <nav>
-                        <Select onCreate={(text)=>text} keygen={(data)=>`${data}${Math.random().toPrecision(3)}`} data={["Common","Un-common","Rare","Spell","Trap"]} placeholder="Search" multiple onFilter={text => d => d.indexOf(text) >= 0} filterDelay={0}/>
+                        <Select onCreate={(text)=>text} keygen={(data: any)=>`${data}${Math.random().toPrecision(3)}`} data={["Common","Un-common","Rare","Spell","Trap"]} placeholder="Search" multiple onFilter={text => d => d.indexOf(text) >= 0} filterDelay={0}/>
                         <Button type="primary">Search</Button>
                     </nav>
                     <section>

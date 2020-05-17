@@ -4,7 +4,7 @@ import Sidenav from './Sidenav';
 import {history} from '../utils/history';
 import DeckEditor from './editor/DeckEditor';
 import Game from '../game/Game';
-import Play from './Play';
+import Play from './play/Play';
 import Account from './Account';
 import Settings from './Settings';
 function MainMenu(){

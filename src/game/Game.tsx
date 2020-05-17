@@ -13,30 +13,37 @@ export default class Game extends Component<{},{overlay: boolean}>{
         }
     }
     componentDidMount(){
+        gameState.showOverlay.observables.show.subscribe((value: any)=>this.setState({overlay: value}));
         init(this.gameElement.current as HTMLCanvasElement);
     }
     componentWillUnmount(){
         OpponentHander.getInstance().terminate();
     }
     render(){
-        if(this.state.overlay){
             return <div>
-                        <div id="game-overlay">
-                            <Button type="secondary">Menu</Button>
-                        </div>
-                        <div id="turn_time">
-                                <p>{"0.00"}</p>
-                                <Button type="secondary" onClick={()=>gameState.nextTurn()}>wating</Button>
-                        </div>
-                        <SelfStats/>
-                        <OpponentStats/>
+                        {this.Overlay()}
                         <canvas id="game" ref={this.gameElement}></canvas>
                 </div>
+    }
+    Overlay(){
+        if(this.state.overlay){
+            return <>
+                 <div id="game-overlay">
+                    <Button type="secondary">Menu</Button>
+                </div>
+                <div id="turn_time">
+                    <p>{"0.00"}</p>
+                    <Button type="secondary" onClick={()=>gameState.nextTurn()}>wating</Button>
+                </div>
+                <SelfStats/>
+                <OpponentStats/>
+            </>
         }else{
             return null;
         }
     }
 }
+
 
 
 function SelfStats(){

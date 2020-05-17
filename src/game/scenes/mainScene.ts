@@ -21,7 +21,9 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.settings.uuid = data.settings.uuid;
         this.settings.online = data.settings.online as any === "true" ? true : false;
     }
-    preload(){}
+    preload(){
+        this.gameState.showOverlay.proxy.show = true;
+    }
     create(){
         this.player_hand = new Hand({
             scene: this, 

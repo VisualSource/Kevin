@@ -28,7 +28,7 @@ export default class CardJson{
       }
     }
   }
-
+ //update to how client site handles fetch data
   async load(){
         const data = await window.localStorage.getItem("cards");
        if(data){
@@ -66,6 +66,24 @@ export class CardDeckMannager{
               this.opponentDeck = data.deck;
             });
           }
+      }
+      get deckSet(){
+        return this.userDeck.length > 0 ? true : false;
+      }
+      setDeck(id: string){
+        const data = window.localStorage.getItem(id);
+        if(data !== null){
+          this.userDeck = JSON.parse(data);
+        }
+        
+      }
+      getDecks(): string[]{
+        let decks = [];
+        for (let i = 0; i < window.localStorage.length; i++) {
+          const key = window.localStorage.key(i);
+          if(key?.includes("deck_")) decks.push((key as string).split("_")[1]);
+        }
+        return decks;
       }
       loadDeck(id: string = "default"){
         try {

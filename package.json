@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-spa-js": "^1.8.1",
     "phaser": "^3.23.0",
     "phaser-component-health": "^2.0.3",
     "phaser-plugin-scene-watcher": "^4.2.0",
@@ -18,7 +19,7 @@
     "start": "rescripts start",
     "build": "rescripts build",
     "test": "rescripts test",
-    "WW:Core":"cd .. && cd webworkercore && npm run build",
+    "WW:Core": "cd .. && cd webworkercore && npm run build",
     "card": "cd .. && cd cardbuilder && npm start"
   },
   "eslintConfig": {

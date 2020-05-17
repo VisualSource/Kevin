@@ -1,5 +1,7 @@
 {
-    "version":"0.1.0-alpha",
+    "profile":{
+        "version":"0.1.0-alpha"
+    },
     "for":"client-0.1.0-alpha-rc2",
     "expanions":[],
     "cards":[
