@@ -1,12 +1,29 @@
 
 let instance: any = null;
 export default class QueryableWorker{
-    static getInstance(url?: string): QueryableWorker{
-        if(instance == null && url){
-          instance = new QueryableWorker(url as string);
+    static getInstance(): QueryableWorker{
+        if(instance == null){
+          //instance = new QueryableWorker();
+          throw new Error("Could not get current Worker");
         }
         return instance;
-      }
+    }
+    static create(type: "singleplayer" | "multiplayer" = "singleplayer"): QueryableWorker{
+        if(instance === null){
+            instance = new QueryableWorker(type === "singleplayer" ? "/workers/AIOpponentWorker.js" : "/workers/OnlineOpponetWorker.js");
+            return instance;
+        }else{
+            instance.terminate();
+            instance = null;
+            return QueryableWorker.create(type);
+        }
+    }
+    static kill(): void{
+        if(instance !== null){
+            instance.terminate();
+            instance = null;
+        }
+    }
     workerInstance: Worker;
     listeners: {[name: string]: Function} = {}
     constructor(url: string){

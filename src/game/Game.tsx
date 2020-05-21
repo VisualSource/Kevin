@@ -3,17 +3,22 @@ import {init} from './main';
 import {Button} from 'shineout';
 import GameState from './state/GameState';
 import OpponentHander from './state/OpponentHander';
-const gameState = GameState.getInstance();
-export default class Game extends Component<{},{overlay: boolean}>{
-    public gameElement = createRef<HTMLCanvasElement>()
+
+export default class Game extends Component<{},{overlay: boolean,buttonDisable:boolean}>{
+    public gameElement = createRef<HTMLCanvasElement>();
+    gameState = GameState.getInstance();
     constructor(props: any){
         super(props);
         this.state = {
-            overlay: false
+            overlay: false,
+            buttonDisable: false
         }
     }
     componentDidMount(){
-        gameState.showOverlay.observables.show.subscribe((value: any)=>this.setState({overlay: value}));
+        this.gameState.OverlayObserve.show.subscribe((value: any)=>this.setState({overlay: value}));
+        this.gameState.OverlayObserve.turnOwner.subscribe((value: any)=>{
+             this.setState({buttonDisable: (value === "self" ? false : true)});
+        });
         init(this.gameElement.current as HTMLCanvasElement);
     }
     componentWillUnmount(){
@@ -33,10 +38,10 @@ export default class Game extends Component<{},{overlay: boolean}>{
                 </div>
                 <div id="turn_time">
                     <p>{"0.00"}</p>
-                    <Button type="secondary" onClick={()=>gameState.nextTurn()}>wating</Button>
+                    <Button type="primary" disabled={this.state.buttonDisable} onClick={()=>this.gameState.nextTurn()}>wating</Button>
                 </div>
-                <SelfStats/>
-                <OpponentStats/>
+                <PlayerStats owner={this.gameState.selfProxy} observe={this.gameState.selfObserve} css="player-self"/>
+                <PlayerStats owner={this.gameState.oppoentProxy} observe={this.gameState.opponentObserve} css="player-opponent "/>
             </>
         }else{
             return null;
@@ -46,36 +51,19 @@ export default class Game extends Component<{},{overlay: boolean}>{
 
 
 
-function SelfStats(){
-    const [mana, setMana] = useState(gameState.selfProxy.mana);
-    const [health, setHealth] = useState(gameState.selfProxy.health);
-    const [turns, setTurns] = useState(gameState.selfProxy.turns);
+function PlayerStats({owner, observe, css}:{owner: any, observe: any, css: string}){
+    const [mana, setMana] = useState(owner.mana);
+    const [health, setHealth] = useState(owner.health);
+    const [turns, setTurns] = useState(owner.turns);
     useEffect(()=>{
-        gameState.selfObserve.health.subscribe((data: number)=>setHealth(data));
-        gameState.selfObserve.mana.subscribe((data: number)=>setMana(data));
-        gameState.selfObserve.turns.subscribe((data: number)=>setTurns(data));
+        observe.health.subscribe((data: number)=>setHealth(data));
+        observe.mana.subscribe((data: number)=>setMana(data));
+        observe.turns.subscribe((data: number)=>setTurns(data));
     },[])
-    return <div id="self">
+    return <div id="player-info" className={css}>
             <p>Mana: {mana}</p>
             <p>Health: {health}</p>
             <p>Turns: {turns}</p>
-            <img src="" alt="player_self"/>
-          </div>
-}
-
-function OpponentStats(){
-    const [mana, setMana] = useState(gameState.oppoentProxy.mana);
-    const [health, setHealth] = useState(gameState.oppoentProxy.health);
-    const [turns, setTurns] = useState(gameState.oppoentProxy.turns);
-    useEffect(()=>{
-        gameState.opponentObserve.health.subscribe((data: number)=>setHealth(data));
-        gameState.opponentObserve.mana.subscribe((data: number)=>setMana(data));
-        gameState.opponentObserve.turns.subscribe((data: number)=>setTurns(data));
-    },[])
-    return <div id="opponent">
-            <p>Mana: {mana}</p>
-            <p>Health: {health}</p>
-            <p>Turns: {turns}</p>
-            <img src="" alt="player_opponent"/>
+            <img src="" alt="user_logo"/>
           </div>
 }

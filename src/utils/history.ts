@@ -48,5 +48,10 @@ function serializeQueryParams(queryParams: any){
 }
 
 export function routeTo(path: string, {replace = false, query}:{replace?: boolean, query?: {[name: string]: any}}){
-    history.push(`${path}${serializeQueryParams(query)}`);
+    const location = `${path}${serializeQueryParams(query)}`;
+    if(!replace){
+        history.push(location);
+    }else{
+        history.replace(location);
+    }
 }

@@ -15,9 +15,12 @@ declare namespace KevinOnline{
         }
         interface IDragableCard extends BaseParams{
             id: number;
+            canInteract?: boolean;
+            hidden?: boolean;
         }
         interface IHandGroup extends BaseParams{
-            children: Phaser.GameObjects.GameObject[]
+            children: Phaser.GameObjects.GameObject[];
+            config?: IHandConfigParams;
         }
         interface IBoardCard extends BaseParams{
             id: number;
@@ -30,6 +33,21 @@ declare namespace KevinOnline{
             start: IPosistion;
             spacing: number;
             graveyard: IPosistion;
+        }
+        interface IHandConfigParams{
+            cards_in_hand?:number; 
+            max_cards_in_hand?:number;
+            fly_in_direction?: boolean;
+            rotate_cards_to_offset?: boolean;
+            card_offset?: number;
+            rotation_distance_scale_factor?: number;
+            radius_offset?: number;
+            card_spacing?:number;
+            dynamic_spacing?: boolean;
+            dynamic_spacing_max_offset?: number;
+            screenOffestX?: number;
+            screenOffestY?: number;
+            card_scale?: number;
         }
     }
     namespace Objects{

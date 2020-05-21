@@ -2,65 +2,12 @@ import React,{useState, useEffect} from 'react';
 import {Button, Select, Input, Card, Tag} from 'shineout';
 
 
-//import CardJson from '..';
-const test =  {
-    "index":0,
-    "name":"Pyromaniac Kevin",
-    "type":"Trap",
-    "class":"Obelisk",
-    "rarity":"Common",
-    "special": false,
-    "visual":{
-        "front_texture":"pyro_kevin",
-        "back_texture":"default"
-    },
-    "attack":{
-        "damage": 0,
-        "mana_cost":0,
-        "can_attack_player": false,
-        "can_attack_cards": false,
-        "damage_type":"basic",
-        "attack_particle":"",
-        "sound_cue_attack":""
-    },
-    "health":{
-        "health": 1,
-        "life_expectancy": 10,
-        "death_particle": "",
-        "sound_cue_death":""
-    },
-    "abilities":[
-        {
-            "type":"discard_cards_in_hand",
-            "ability_int": 1,
-            "trigger": "on_drop",
-            "after_use_state":"remain_in_play",
-            "affecting_player":"self",
-            "partice":"",
-            "sound_cue":""
-        }
-    ],
-    "description":"Hand a bit to much fun",
-    "placement_settings":{
-        "owner":"opponent",
-        "mana_cost": 2,
-        "entry_particle":"",
-        "sound_cue_entry":""
-    },
-    "deck_settings":{
-        "unlocked": true,
-        "add_to_player_deck": true,
-        "max_num_in_deck": 3,
-        "weight": 0,
-        "screen_size":{
-            "x":200,
-            "y": 280
-        }
-    }
-}
+import CardJson from '../../game/utils/Loader';
+
+
 export default function DeckEditor(){
     document.title = "Kevin Online - Deck Editor";
-    const [cards, setCards] = useState([test]);
+    const [cards, setCards] = useState<KevinOnline.CardData[]>([]);
     const [deck,setDeck] = useState([{id:0, amount: 1}]);
     const [cardCount, setCardCount] = useState<number>(0);
     const [viewCard,setViewCard] = useState({});
@@ -75,6 +22,9 @@ export default function DeckEditor(){
             return count;
     }
     useEffect(()=>{
+        CardJson.getInstance().fetch().then(data=>{
+            setCards(data.cards);
+        });
         calcCount();
     },[])
    
@@ -146,7 +96,7 @@ export default function DeckEditor(){
                                         },1)
                                     }}>
                                             {card.amount}
-                                            {cards[card.id].name}
+                                            {cards[card.id]?.name}
                                         </Tag>    
                                 })
                             }

@@ -4,7 +4,7 @@ import {clamp,lerp,select} from '../utils/Math';
 import {CardDeckMannager} from '../utils/Loader';
 export default class Hand extends GameObjects.Group implements KevinOnline.Objects.Hand {
     cards_in_hand = 0;
-    max_cards_in_hand = 2;
+    max_cards_in_hand = 30;
     fly_in_direction: boolean = true;
     rotate_cards_to_offset: boolean = true;
     card_offset: number = 0;
@@ -16,8 +16,21 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
     screenOffestX: number = window.innerWidth/2;
     screenOffestY: number = -window.innerHeight+100;
     card_scale: number = 1;
-    constructor({scene, children}: KevinOnline.Params.IHandGroup){
+    constructor({scene, children, config}: KevinOnline.Params.IHandGroup){
         super(scene, children);
+        this.cards_in_hand = config?.cards_in_hand ?? 0;
+        this.max_cards_in_hand = config?.max_cards_in_hand ?? 30;
+        this.fly_in_direction = config?.fly_in_direction ?? true;
+        this.rotate_cards_to_offset = config?.rotate_cards_to_offset ?? true;
+        this.card_offset = config?.card_offset ?? 0;
+        this.rotation_distance_scale_factor = config?.rotation_distance_scale_factor ?? 0.15;
+        this.radius_offset = config?.radius_offset ?? -0.05;
+        this.card_spacing = config?.card_spacing ?? 250;
+        this.dynamic_spacing = config?.dynamic_spacing ?? true;
+        this.dynamic_spacing_max_offset = config?.dynamic_spacing_max_offset ?? 100;
+        this.screenOffestX = config?.screenOffestX ?? (window.innerWidth/2);
+        this.screenOffestY = config?.screenOffestY ?? (-window.innerHeight+80);
+        this.card_scale = config?.card_scale ?? 1;
         scene.add.existing(this);
         this.init();
     }

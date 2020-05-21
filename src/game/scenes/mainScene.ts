@@ -12,6 +12,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
     player_1_board: any;
     player_2_board: any;
     player_hand: any;
+    opponent_hand: any;
     player_1_board_c: any;
     player_2_board_c: any;
     constructor(){
@@ -25,13 +26,29 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.gameState.showOverlay.proxy.show = true;
     }
     create(){
+        this.opponent_hand = new Hand({
+            scene: this,
+            config: {
+                card_scale: 1,
+                rotation_distance_scale_factor: -0.15,
+                radius_offset: 0.05,
+                card_spacing: 250,
+                screenOffestY: 5
+            },
+            children: [
+                new dragableCard({scene: this, id:0, canInteract: false, hidden: true}),
+                new dragableCard({scene: this, id:0, canInteract: false, hidden: true}),
+                new dragableCard({scene: this, id:0, canInteract: false, hidden: true}),
+                new dragableCard({scene: this, id:0, canInteract: false, hidden: true})
+            ]
+        });
         this.player_hand = new Hand({
             scene: this, 
             children: [
-                new dragableCard({scene: this, id:0}),
-                new dragableCard({scene: this, id:0}),
-                new dragableCard({scene: this, id:0}),
-                new dragableCard({scene: this, id:0})
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")})
             ]
         });
         this.player_1_board = new BoardObject({ 

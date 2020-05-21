@@ -28,7 +28,6 @@ export default class CardJson{
       }
     }
   }
- //update to how client site handles fetch data
   async load(){
         const data = await window.localStorage.getItem("cards");
        if(data){
@@ -44,7 +43,7 @@ export default class CardJson{
         }
     }
     async hotreloadData(){
-      const cards = await fetch("http://localhost:3000/db.json").then(e=>e.json())
+      const cards = await fetch("http://localhost:3000/db.json").then(e=>e.json());
       this.resources = cards;
     }
 }
@@ -62,7 +61,7 @@ export class CardDeckMannager{
           const handler = OpponentHander.getInstance();
           if(handler !== null){
             handler.send("request_deck",{});
-            handler.addListeners("reply_deck",(data: any)=>{
+            handler.addListeners("request_deck",(data: any)=>{
               this.opponentDeck = data.deck;
             });
           }

@@ -12,40 +12,44 @@ export const Auth0Provider = ({
     onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
     ...initOptions
   }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState();
-    const [user, setUser] = useState();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState({});
     const [auth0Client, setAuth0] = useState();
     const [loading, setLoading] = useState(true);
     const [popupOpen, setPopupOpen] = useState(false);
   
     useEffect(() => {
-      const initAuth0 = async () => {
-          //@ts-ignore
-        const auth0FromHook = await createAuth0Client(initOptions);
-        setAuth0(auth0FromHook);
-  
-        if (window.location.search.includes("code=") &&
-            window.location.search.includes("state=")) {
-          const { appState } = await auth0FromHook.handleRedirectCallback();
-          //@ts-ignore
-          onRedirectCallback(appState);
+      const initAuth0 = async () => {        
+        try {
+            //@ts-ignore
+          const auth0FromHook = await createAuth0Client(initOptions);
+          setAuth0(auth0FromHook);
+    
+          if (window.location.search.includes("code=") &&
+              window.location.search.includes("state=")) {
+            const { appState } = await auth0FromHook.handleRedirectCallback();
+            //@ts-ignore
+            onRedirectCallback(appState);
+          }
+    
+          const isAuthenticated = await auth0FromHook.isAuthenticated();
+          setIsAuthenticated(isAuthenticated);
+    
+          if (isAuthenticated) {
+            const user = await auth0FromHook.getUser();
+            setUser(user);
+          }
+    
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          console.log(error);
         }
-  
-        const isAuthenticated = await auth0FromHook.isAuthenticated();
-  
-        setIsAuthenticated(isAuthenticated);
-  
-        if (isAuthenticated) {
-          const user = await auth0FromHook.getUser();
-          setUser(user);
-        }
-  
-        setLoading(false);
       };
       initAuth0();
       // eslint-disable-next-line
     }, []);
-  
+
     const loginWithPopup = async (params = {}) => {
       setPopupOpen(true);
       try {

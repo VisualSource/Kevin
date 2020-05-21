@@ -1,25 +1,25 @@
 import EventDispatcher from '../utils/EventDispatcher';
-import OpponentHandler from './OpponentHander';
+import QueryableWorker from './OpponentHander';
 import { observe } from "rxjs-observe";
 
 let instance: any = null;
 export default class GameState{
-    private emmiter: EventDispatcher = EventDispatcher.getInstance();
-    public opponentHandler: OpponentHandler = OpponentHandler.getInstance();
-    self: any;
-    opponent: any;
-    showOverlay: any;
-    private turnOwner: "self" | "oppoent" = "self";
     static getInstance(): GameState{
-        if(instance == null){
+        if(instance === null){
           instance = new GameState();
         }
         return instance;
     }
+    private emmiter: EventDispatcher = EventDispatcher.getInstance();
+    public worker: QueryableWorker = QueryableWorker.getInstance();
+    self = observe({health: 30, mana: 2000, turns: 0});
+    opponent = observe({health: 30, mana: 1, turns: 0});
+    showOverlay = observe({show: false, turnOwner: "self"});
     constructor(){
-        this.self = observe({health: 30, mana: 2000, turns: 0}); 
-        this.opponent = observe({health: 30, mana: 1, turns: 0});
-        this.showOverlay = observe({show: false});
+        this.worker.addListeners("turn_change",()=>{
+            console.log("TEST");
+            this.nextTurn();
+        });
     }
     get selfProxy(){
         return this.self.proxy;
@@ -33,25 +33,27 @@ export default class GameState{
     get opponentObserve(){
         return this.opponent.observables
     }
+    get OverlayProxy(){
+        return this.showOverlay.proxy;
+    }
+    get OverlayObserve(){
+        return this.showOverlay.observables;
+    }
    
     nextTurn(){
         // make sure to update the oppoent 
-        if(this.turnOwner === "self"){
+        if( this.OverlayProxy.turnOwner === "self"){
             this.emmiter.emit("end_of_turn",{owner:"self"});
             this.emmiter.emit("start_of_turn",{owner:"opponent"});
             this.selfProxy.turns++;
-            this.turnOwner ="oppoent";
-           
+            this.OverlayProxy.turnOwner = "opponent";
+            this.worker.send("turn_change",{ test: "A"});
         }else{
             this.emmiter.emit("end_of_turn",{owner:"opponent"});
             this.emmiter.emit("start_of_turn",{owner:"self"});
             this.oppoentProxy.turns++;
-            this.turnOwner = "self";
-         
+            this.OverlayProxy.turnOwner = "self";
+            this.worker.send("turn_change",{ test:"B"});
         }
     }
-
-    
-   
-   
 }
