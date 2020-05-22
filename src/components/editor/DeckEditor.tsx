@@ -26,9 +26,7 @@ export default function DeckEditor(){
             setCards(data.cards);
         });
         calcCount();
-    },[])
-   
-   
+    },[]);
     return <div id="editor">
             <div id="card-viewer"> 
                 <Button type="secondary" onClick={()=>window.history.back()}>Exit</Button>
@@ -77,7 +75,9 @@ export default function DeckEditor(){
                                                         }
                                                     
                                                     }}>Add</Button>
-                                                    <Button type="link" onClick={()=>{}}>View</Button>
+                                                    <Button type="link" onClick={()=>{
+                                                        setViewCard(deck[card.index]);
+                                                    }}>View</Button>
                                                 </div>
                                           </Card>
                                 })
@@ -85,7 +85,7 @@ export default function DeckEditor(){
                     </section>
                 </section>
                 <div id="deck">
-                        <Input size="small" placeholder="Deck Name"/>
+                        <Input size="small" placeholder="Deck Name" onChange={(value)=>{setDeckName(value)}}/>
                         <section>
                             {
                                 deck.map(card=>{

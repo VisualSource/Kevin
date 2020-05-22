@@ -59,7 +59,7 @@ function PlayerStats({owner, observe, css}:{owner: any, observe: any, css: strin
         observe.health.subscribe((data: number)=>setHealth(data));
         observe.mana.subscribe((data: number)=>setMana(data));
         observe.turns.subscribe((data: number)=>setTurns(data));
-    },[])
+    },[observe.health,observe.mana,observe.turns]);
     return <div id="player-info" className={css}>
             <p>Mana: {mana}</p>
             <p>Health: {health}</p>

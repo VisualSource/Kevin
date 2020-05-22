@@ -4,6 +4,17 @@
    (global = global || self, factory(global.Core = {}));
 }(this, (function (exports) { 'use strict';
 
+   (function (Events) {
+       Events["REQUEST_DECK"] = "request_deck";
+       Events["READY"] = "ready";
+       Events["TURN_CHANGE"] = "turn_change";
+       Events["KICK"] = "kick";
+       Events["GAME_START"] = "game_start";
+       Events["JOIN_CODE"] = "join_code";
+       Events["AI_DIFFICLTY"] = "ai_difficlty";
+       Events["INIT"] = "init";
+       Events["STATUS_OPPONENT"] = "status_opponent";
+   })(exports.Events || (exports.Events = {}));
    /**
     * A Class to hand event send from the main thread.
     *
@@ -29,7 +40,7 @@
    /**
     * A function to handle the replying to the main thread
     *
-    * @param {string} name
+    * @param {Events} name
     * @param {any} data
     */
    function reply(name, data) {

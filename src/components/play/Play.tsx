@@ -1,4 +1,5 @@
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, useState, useReducer, useCallback} from 'react';
+import useForceUpdate from 'use-force-update';
 import Sidenav from '../Sidenav';
 import {Button, Select, Image, Input, Message, Spin, Modal} from 'shineout';
 import {routeTo,queryFromURI} from '../../utils/history';
@@ -13,7 +14,7 @@ export default function Play(){
     return <div id="play">
         <main>
             <Route path="/play/:type">
-                <PlayGame host={true}/>
+                        <PlayGame host={true}/>
             </Route>
             <Route exact path="/play">
                 <PlayHome/>
@@ -24,52 +25,78 @@ export default function Play(){
 
 }
 type ButtonTypes = "link" | "success" | "default" | "primary" | "secondary" | "warning" | "danger" | undefined;
-let worker: QueryableWorker;
-function PlayGame(props: any){
-    const [loadState, setLoadState] = useState(true);
-    const [mode, setMode] = useState();
-    const [host,setHost] = useState<boolean>(false);
-    const [decks, setDecks] = useState<string[]>([]);
-    const [oppontName, setOpponentName] = useState("Wating for User");
-    const [opponetStatus, setOpponetStatus] = useState("Wating");
-    const [userStatus,setUserStatus] = useState({status: "Wating", button: "success", text: "Ready"});
-    const [userLogo, setUserLogo] = useState("");
-    const [userName, setUserName] = useState("USERNAME");
-    const [opponentLogo, setOpponentLogo] = useState<string>("user_logo");
-    const [canStart, setCanStart] = useState(true);
-    const [joinCode, setJoinCode] = useState("Wating for Code");
-    const {type} = useParams();
-    //@ts-ignore
-    const {user, loading, isAuthenticated } = useAuth0();
-    const checkCanStart = () => {
-        if(userStatus.status === "Ready" && opponetStatus === "Ready"){
-            setCanStart(false);
-        }else{
-            setCanStart(true);
-        } 
+let worker: QueryableWorker | null = null;
+function userReducer(state: any, action: any){
+    switch(action.type){
+        case "logo_name":{
+            state.logo = action.value.logo;
+            state.name = action.value.name;
+            return state;
+        }
+        case "status":{
+            state.status.status = action.value.status;
+            state.status.button = action.value.button;
+            state.status.text = action.value.text;
+            return state;
+        }
+        default:
+            return state;
     }
+}
+function opponentReducer(state:any,action:any){
+    switch(action.type){
+        case "user":{
+            state.logo = action.value.logo;
+            state.name = action.value.name;
+            state.status = action.value.status;
+            return state;
+        }
+        case "status":{
+            state.status = action.value.status;
+            return state;
+        }
+        default:
+            return state;
+    }
+}
+function PlayGame(props:any){
+    const forceUpdate = useForceUpdate();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [code, setCode] = useState("NO CODE");
+    const [decks, setDecks] = useState<string[]>([]);
+    const [host, setHost] = useState<boolean>(false);
+    const [userData, dispatchUser] = useReducer(userReducer, {logo:"", name:"USERNAME", status: {status: "Wating", button: "success", text: "Ready"}});
+    const [opponentData, dispatchOpponent] = useReducer(opponentReducer, {logo:"", name:"USERNAME", status: "Wating"});
+    const [mode, setMode] = useState<string>();
+    //@ts-ignore
+    const {loading, isAuthenticated,user} = useAuth0();
+    const {type} = useParams();
+    const canStart = useCallback(()=>{
+        if(userData.status.status === "Ready" && opponentData.status === "Ready") return false;
+        return true;
+    },[opponentData.status,userData.status.status])
     useEffect(()=>{
-        const init = (icon: string)=>{
-            setMode(type);
-            setUserLogo(icon);
+        const init = (online: string)=>{
+            setMode(online);
             setDecks(cdMannager.getDecks());
+            setIsLoading(false);
             worker = QueryableWorker.create(type);
             worker.send("join_code",{ join: queryFromURI()});
-            worker.send("init",{ name: user?.name ?? "USERNAME", status: userStatus, logo: icon});
+            worker.send("init",{ name: userData.name, status: userData.status.status, logo: userData.logo});
             worker.addListeners("init",(event: any)=>{
-                setOpponentName(event.name);
-                setOpponetStatus(event.status);
-                setOpponentLogo(event.logo);
+                dispatchOpponent({type:"user", value: {name: event.name, status: event.status, logo: event.logo}});
+                forceUpdate();
             });
             worker.addListeners("status_opponent",(event: any)=>{
-                setOpponetStatus(event);
-                checkCanStart();
+                dispatchOpponent({type:"status", value:{status: event}});
+                forceUpdate();
+                //checkCanStart();
             });
             worker.addListeners("join_code",(event: any)=>{
-                setJoinCode(event.uuid);
+                setCode(event.uuid);
             });
             worker.addListeners("game_start",(event: any)=>{
-                routeTo("/game",{query:{uuid: joinCode, online: true}, replace: true});
+                routeTo("/game",{query:{uuid: code, online: true}, replace: true});
             });
             worker.addListeners("kick",(event: any)=>{
                 //@ts-ignore
@@ -79,46 +106,35 @@ function PlayGame(props: any){
                 });
                 routeTo("/play",{replace: true});
             });
+            forceUpdate();
         }
-        const check = () =>{
-            if(loading){
-                setTimeout(()=>{
-                    check();
-                },500);
+        if(!loading){
+            if(isAuthenticated && type === "multiplayer"){
+                dispatchUser({type:"logo_name", value:{logo: user?.picture ?? "", name: user?.name ?? "USERNAME"}});
+                setHost(props.host);
+                init("multiplayer");
+            }else if(type === "singleplayer"){
+                dispatchUser({type:"logo_name", value:{logo: user?.picture ?? "", name: user?.name ?? "USERNAME"}});
+                setHost(true);
+                init("singleplayer");
             }else{
-               if(worker){
-                   QueryableWorker.kill();
-                   (worker as any) = null;
-               }
-               if(isAuthenticated && type === "multiplayer"){
-                    setLoadState(false);
-                    setHost(props.host);
-                    setUserName(user.name);
-                    init(user.picture);
-               }else if(type === "singleplayer"){
-                    setLoadState(false);
-                    setHost(true);
-                    setUserName(user?.name ?? "USERNAME");
-                    init(user?.picture ?? "default.webp");
-               }else{
-                    //@ts-ignore
-                    Message.error('Failed to Authenticate',5,{
-                        position: "bottom-right",
-                        title: "Error"
-                    });
-                   routeTo("/play",{replace: true});
-               }
-               checkCanStart();
+                //@ts-ignore
+                Message.error('Failed to Authenticate',5,{
+                    position: "bottom-right",
+                    title: "Error"
+                });
+                routeTo("/play",{replace: true});
             }
         }
-        check();
-    },[isAuthenticated,loading,type,user,userStatus]);
-    if(loadState){
+    },[loading]);
+
+    if(isLoading){
         return <div id="playing">
             <Spin size={50} name="cube-grid"></Spin>
         </div>
     }
-    return <div id="playing">
+
+     return <div id="playing">
                 <nav id="play-nav">
                     <Select onChange={(value)=>{
                         cdMannager.setDeck("deck_"+value);
@@ -128,27 +144,26 @@ function PlayGame(props: any){
                     <div id="left"></div>
                     <div id="right"></div>
                     <div id="right-profile">
-                        <Image shape="circle" width={150} height={150} title="user_logo" src={opponentLogo}/>
-                        <h4>{oppontName}</h4>
-                        <p>Status: {opponetStatus}</p>
+                        <Image shape="circle" width={150} height={150} title="user_logo" src={opponentData.logo}/>
+                        <h4>{opponentData.name}</h4>
+                        <p>Status: {opponentData.status}</p>
                         {mode === "singleplayer" ?  <Select onChange={(value)=>{
-                            worker.send("ai_difficlty",{value});
+                            worker?.send("ai_difficlty",{value});
                         }} keygen={(value: any)=>value} data={["Easy","Normal","Hard"]} defaultValue={[1]} style={{width: 120}} placeholder="Set Difficlty"/> :<Button type="danger" onClick={()=>{
-                            setOpponetStatus("Wating");
-                            setOpponentName("Wating for User");
-                            setOpponentLogo("no_user");
-                            worker.send("kick",{}) }
+                            dispatchOpponent({type:"user", value:{status:"Wating", name:"Wating for User", logo:"no_user"}});
+                            worker?.send("kick",{}); }
                             }>Kick</Button>}
                     </div>
                     <div id="left-profile">
-                        <Image shape="circle" width={150} height={150} title="user_logo" src={userLogo}/>
-                        <h4>{userName}</h4>
-                        <p>Status: {userStatus.status}</p>
-                        <Button type={userStatus.button as ButtonTypes} onClick={()=>{
+                        <Image shape="circle" width={150} height={150} title="user_logo" src={userData.logo}/>
+                        <h4>{userData.name}</h4>
+                        <p>Status: {userData.status.status}</p>
+                        <Button type={userData.status.button as ButtonTypes} onClick={()=>{
                             if(cdMannager.deckSet){
-                                   setUserStatus(userStatus.status === "Ready" ?  {status: "Wating", button: "success", text: "Ready"} : {status: "Ready", button: "danger", text: "Unready"} );
-                                   worker.send("status_opponent",{status:userStatus.status});
-                                   checkCanStart();
+                                    dispatchUser({type:"status", value: userData.status.status === "Ready" ?  {status: "Wating", button: "success", text: "Ready"} : {status: "Ready", button: "danger", text: "Unready"}});
+                                    forceUpdate();
+                                    worker?.send("status_opponent",{status:userData.status.status});
+                                   //checkCanStart();
                             }else{
                                 //@ts-ignore
                                 Message.error('You need to select a deck!',5,{
@@ -156,20 +171,19 @@ function PlayGame(props: any){
                                     title: "Error"
                                 });
                             }
-                        }}>{userStatus.text}</Button>
+                        }}>{userData.status.text}</Button>
                     </div>
                     <div id="center">
                         <h1>Join Code</h1>
-                        <Input style={{width: 240}}  placeholder="d853c4929da544aea121" disabled defaultValue={joinCode} value={joinCode}/>
-                       {host ?  <Button loading={canStart} type="primary" onClick={()=>{
-                            worker.send("game_start",{});
-                            routeTo("/game",{query:{uuid: joinCode, online: false}, replace: true});
+                        <Input style={{width: 240}}  placeholder="d853c4929da544aea121" disabled defaultValue={code} value={code}/>
+                       {host ?  <Button loading={canStart()} type="primary" onClick={()=>{
+                            worker?.send("game_start",{});
+                            routeTo("/game",{query:{uuid: code, online: false}, replace: true});
                        }}>Start</Button>: null}
                     </div>
                 </div>
            </div>;
 }
-
 
 function PlayHome(){
     const [showModal, setShowModal] = useState(false);

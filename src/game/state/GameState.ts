@@ -17,8 +17,9 @@ export default class GameState{
     showOverlay = observe({show: false, turnOwner: "self"});
     constructor(){
         this.worker.addListeners("turn_change",()=>{
-            console.log("TEST");
-            this.nextTurn();
+            if(this.OverlayProxy.turnOwner !== "self"){
+                this.nextTurn();
+            }
         });
     }
     get selfProxy(){

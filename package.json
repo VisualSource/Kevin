@@ -13,6 +13,7 @@
     "react-scripts": "3.4.1",
     "rxjs-observe": "^2.1.5",
     "shineout": "^1.5.2",
+    "use-force-update": "^1.0.7",
     "yuka": "^0.3.7"
   },
   "scripts": {

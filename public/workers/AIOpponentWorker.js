@@ -1,5 +1,7 @@
 importScripts("./core.js", "./yuka.min.js");
-const eventHandler = new Core.EventHandler();
+const { Events, EventHandler, reply } = Core;
+const eventHandler = new EventHandler();
+self.onmessage = (event) => { eventHandler.emit(event.data.name, event.data.data); };
 const deck = [{ id: 0, ammount: 3 }];
 const ai_config = {
     uuid: YUKA.MathUtils.generateUUID(),
@@ -9,36 +11,33 @@ const ai_config = {
     logo: "https://avatars1.githubusercontent.com/u/43074703?s=460&u=dee105f7822e6e3434ae46897889a0802fbc68cc&v=4",
     status: "Ready"
 };
-self.onmessage = (event) => { eventHandler.emit(event.data.name, event.data.data); };
-eventHandler.addListener("request_deck", () => {
-    Core.reply("request_deck", { deck, id: ai_config.uuid });
+eventHandler.addListener(Events.REQUEST_DECK, () => {
+    reply(Events.REQUEST_DECK, { deck, id: ai_config.uuid });
 });
-eventHandler.addListener("ready", (event) => {
-    Core.reply("installed", { installed: typeof YUKA === "object" ? "YUKA" : "none" });
+eventHandler.addListener(Events.READY, (event) => {
+    reply("installed", { installed: typeof YUKA === "object" ? "YUKA" : "none" });
 });
-
-
-eventHandler.addListener("turn_change",(event)=>{
+eventHandler.addListener(Events.TURN_CHANGE, (event) => {
     console.log("Turn Change", event);
-    Core.reply("turn_change",{});
+    setTimeout(() => {
+        reply(Events.TURN_CHANGE, {});
+    }, 1000);
 });
-
-eventHandler.addListener("game_start",()=>{});
-eventHandler.addListener("kick",()=>{
-    Core.reply("kick",{});
+eventHandler.addListener(Events.GAME_START, () => { });
+eventHandler.addListener(Events.KICK, () => {
+    reply(Events.KICK, {});
 });
-eventHandler.addListener("join_code",(event)=>{
+eventHandler.addListener(Events.JOIN_CODE, (event) => {
     console.log(event);
-    Core.reply("join_code",{uuid: YUKA.MathUtils.generateUUID()});
+    reply(Events.JOIN_CODE, { uuid: YUKA.MathUtils.generateUUID() });
 });
-eventHandler.addListener("ai_difficlty",(event)=>{
+eventHandler.addListener(Events.AI_DIFFICLTY, (event) => {
     ai_config.difficlty = event;
     console.log("Event: ai_difficlty, Set Ai difficlty to: ", event);
 });
-eventHandler.addListener("init", (event) => { 
-    Core.reply("init", {name: ai_config.name, status: ai_config.status, logo: ai_config.logo});
+eventHandler.addListener(Events.INIT, (event) => {
+    reply(Events.INIT, { name: ai_config.name, status: ai_config.status, logo: ai_config.logo });
 });
-eventHandler.addListener("status_opponent",(event)=>{
+eventHandler.addListener(Events.STATUS_OPPONENT, (event) => {
     console.log("Event: status_opponent", event);
 });
-

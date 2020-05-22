@@ -7,8 +7,5 @@ export default class EventDispatcher extends Events.EventEmitter{
     }
     return instance;
   }
-  constructor(){
-    super();
-  }
 }
 

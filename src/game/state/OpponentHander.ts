@@ -55,9 +55,14 @@ export default class QueryableWorker{
     }
     terminate(){
         this.workerInstance.terminate();
+        return this;
     }
     addListeners(name: string, listener: Function){
         this.listeners[name] = listener;
+    }
+    removeAllListeners(){
+        this.listeners = {};
+        return this;
     }
     removeListeners(name: string){
         delete this.listeners[name];

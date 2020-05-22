@@ -5,7 +5,6 @@ const DEFAULT_REDIRECT_CALLBACK = (event:any) => window.history.replaceState({},
 //@ts-ignore
 export const Auth0Context = createContext();
 export const useAuth0 = () => useContext(Auth0Context);
-
 export const Auth0Provider = ({
     //@ts-ignore
     children,
