@@ -87,11 +87,17 @@ declare namespace KevinOnline{
             removeCard(card: dragableCard): void;
             addCard(card: DragableCard);
             drawCard(owner: KevinOnline.Owner)
-            discardHand(): void;
+            discardCard(amount?: number): void;
+            discardAll(): void;
+            public getCardList(): number[];
+            public addCardById(id: number,hidden: boolean = false, canInteract: boolean = true): this;
+           
         }
         interface MainGameScene extends Phaser.Scene{
             settings: Settings;
+            worker: QueryableWorker;
             player_hand: Hand;
+            opponent_hand: Hand;
             player_1_board: any;
             player_2_board: any;
             player_1_board_c: any;
@@ -161,6 +167,17 @@ declare namespace KevinOnline{
     interface Settings{
         uuid: string;
         online: boolean;
+    }
+    interface QueryableWorker{
+        private workerInstance: Worker;
+        private listeners: {[name: string]: Function};
+        onMessage(event: MessageEvent): void;
+        onError(error: ErrorEvent): void;
+        send(name: string, data: any): this;
+        terminate(): this;
+        addListeners(name: string, listener: Function): this;
+        removeAllListeners(): this;
+        removeListeners(name: string): this;
     }
 }
 

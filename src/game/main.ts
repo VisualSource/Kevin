@@ -51,5 +51,5 @@ class KevinOnline extends Game{
     }
 }
 export function init(canvas: HTMLCanvasElement){
-    const game = new KevinOnline(createConfig(canvas));
+        const game = new KevinOnline(createConfig(canvas));
 }

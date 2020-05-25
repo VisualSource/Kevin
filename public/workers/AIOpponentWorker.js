@@ -2,8 +2,9 @@ importScripts("./core.js", "./yuka.min.js");
 const { Events, EventHandler, reply } = Core;
 const eventHandler = new EventHandler();
 self.onmessage = (event) => { eventHandler.emit(event.data.name, event.data.data); };
-const deck = [{ id: 0, ammount: 3 }];
+const deck = [{ id: 0, ammount: 1 },{ id: 1, ammount: 1 }];
 const ai_config = {
+    start_cards: [0,0,1,1],
     uuid: YUKA.MathUtils.generateUUID(),
     health: 30,
     difficlty: "Normal",
@@ -11,6 +12,13 @@ const ai_config = {
     logo: "https://avatars1.githubusercontent.com/u/43074703?s=460&u=dee105f7822e6e3434ae46897889a0802fbc68cc&v=4",
     status: "Ready"
 };
+
+
+
+eventHandler.addListener("starting_cards",(event)=>{
+        reply("starting_cards",{ cards: ai_config.start_cards});
+});
+
 eventHandler.addListener(Events.REQUEST_DECK, () => {
     reply(Events.REQUEST_DECK, { deck, id: ai_config.uuid });
 });

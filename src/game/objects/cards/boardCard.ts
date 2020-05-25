@@ -13,6 +13,7 @@ function CreateAblites(data: KevinOnline.CardAbilities[], sprite: BoardCard){
    });
 }
 function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
+    sprite.emit("single_use_send_to_graveyard_before_ability");
     const state = GameState.getInstance();
     switch (data.type) {
         case "draw_card":{
@@ -20,6 +21,7 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             for (let i = 0; i < data.ability_int; i++) {
                 switch (data.affecting_player) {
                     case "opponent":
+                        sprite.GameScene.opponent_hand.drawCard("opponent");
                         break;
                     case "self":{
                         sprite.GameScene.player_hand.drawCard("self");
@@ -27,6 +29,7 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
                     }
                     case "self_and_opponent":{
                         sprite.GameScene.player_hand.drawCard("self");
+                        sprite.GameScene.opponent_hand.drawCard("opponent");
                         break;
                     }
                     default:
@@ -131,17 +134,22 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
            break;
         }
         case "discard_cards_in_hand":{
-               switch (data.affecting_player) {
-                   case "self":
-                        sprite.GameScene.player_hand.discardHand();
-                       break;
-                    case "self_and_opponent":{
-                        sprite.GameScene.player_hand.discardHand();
-                        break;
-                    }
-                   default:
-                       break;
-               }
+            switch (data.affecting_player) {
+                case "self":
+                     sprite.GameScene.player_hand.discardCard(data.ability_int);
+                    break;
+                 case "self_and_opponent":{
+                     sprite.GameScene.player_hand.discardCard(data.ability_int);
+                     sprite.GameScene.opponent_hand.discardCard(data.ability_int);
+                     break;
+                 }
+                 case "opponent":{
+                     sprite.GameScene.opponent_hand.discardCard(data.ability_int);
+                     break;
+                 }
+                default:
+                    break;
+            }
               sprite.actionPoints--;
             break;
         }
@@ -159,15 +167,31 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             break;
         }
         case "swap_cards_in_hand":{
+            const scene = sprite.GameScene;
+            const oh = scene.opponent_hand.getCardList();
+            const uh = scene.player_hand.getCardList();
+            scene.player_hand.discardAll();
+            scene.opponent_hand.discardAll();
+            
+            setTimeout(()=>{
+                oh.forEach(value=>{
+                    scene.player_hand.addCardById(value);
+                });
+                uh.forEach(value=>{
+                    scene.opponent_hand.addCardById(value, true, false);
+                });
+            },2);
+
             sprite.actionPoints--;
-              //effect hand
             break;
         }
         default:
             console.log("Not implemented");
             break;
     }
+    sprite.emit("single_use_send_to_graveyard_after_ability");
 }
+//TODO when card moves to graveyard, set dropzone active to false;
 export default class BoardCard extends GameObjects.Sprite implements KevinOnline.Objects.BoardCard{
     cardData: KevinOnline.CardData;
     emmiter: EventDispatcher;
@@ -175,9 +199,11 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     owner: KevinOnline.Owner = "self";
     attack: number;
     actionPoints: number = 1;
+    graveyard: KevinOnline.IPosistion;
     constructor({scene, posistion,id, graveyard, dropzone_id}: KevinOnline.Params.IBoardCard){
         super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
+        this.graveyard = graveyard;
         this.emmiter = EventDispatcher.getInstance();
         this.setData("dropzone_id",dropzone_id);
         this.attack = this.cardData.attack.damage;
@@ -186,14 +212,14 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
         PhaserHealth.AddTo(this, this.cardData.health.health, this.cardData.health.health);
         scene.add.existing(this);
         this.init();
+        this.on("single_use_send_to_graveyard_before_ability",()=>{
+            this.toGraveyard();
+        });
+        this.on("single_use_send_to_graveyard_after_ability",()=>{
+            this.toGraveyard();
+        });
         this.on("die",(spr: BoardCard)=>{
-            this.emit("sent_to_graveyard");//emit for ablity
-            if(spr.cardData.health.sound_cue_death !== ""){
-                spr.scene.sound.play(spr.cardData.health.sound_cue_death);
-            }
-            if(spr.cardData.health.death_particle !== ""){}
-            spr.setPosition(graveyard.x,graveyard.y);
-            spr.setActive(false);
+           this.toGraveyard();
         });
         this.on('healthchange', function (spr: BoardCard, amount: number, health: number, maxHealth: number) {
             // Health changed by ${amount}, now ${health}/${maxHealth}
@@ -235,6 +261,16 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     }
     get GameScene(){
         return this.scene as KevinOnline.Objects.MainGameScene;
+    }
+    toGraveyard(){
+        this.emit("sent_to_graveyard");//emit for ablity
+        if(this.cardData.health.sound_cue_death !== ""){
+            this.scene.sound.play(this.cardData.health.sound_cue_death);
+        }
+        if(this.cardData.health.death_particle !== ""){}
+        this.setPosition(this.graveyard.x,this.graveyard.y);
+        this.setActive(false);
+        return this;
     }
     
 

@@ -1,10 +1,12 @@
-
+import {routeTo} from '../../utils/history';
 let instance: any = null;
-export default class QueryableWorker{
+export default class QueryableWorker implements KevinOnline.QueryableWorker{
     static getInstance(): QueryableWorker{
         if(instance == null){
           //instance = new QueryableWorker();
-          throw new Error("Could not get current Worker");
+          routeTo("/play",{});
+          console.error("No Vaild Worker Instance");
+          
         }
         return instance;
     }
@@ -38,33 +40,35 @@ export default class QueryableWorker{
             }else{
                 console.log(event);
             }
-           
         }
     }
-    onError(error: any){
+    onError(error: ErrorEvent){
         console.error(error);
     }
     /*
         data needs to be a object
     */
-    send(name: string, data: any){
+    send(name: string, data: any): this{
         this.workerInstance.postMessage({
             name,
             data: [data]
         });
+        return this;
     }
-    terminate(){
+    terminate(): this{
         this.workerInstance.terminate();
         return this;
     }
-    addListeners(name: string, listener: Function){
+    addListeners(name: string, listener: Function): this{
         this.listeners[name] = listener;
+        return this;
     }
-    removeAllListeners(){
+    removeAllListeners(): this{
         this.listeners = {};
         return this;
     }
-    removeListeners(name: string){
+    removeListeners(name: string): this{
         delete this.listeners[name];
+        return this;
     }
 }

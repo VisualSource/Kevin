@@ -5,10 +5,12 @@ import Hand from '../objects/Hand';
 import BoardObject from '../objects/Board';
 import GameState from '../state/GameState';
 import {CardDeckMannager} from '../utils/Loader';
+import QueryableWorker from '../state/OpponentHander';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
     settings: KevinOnline.Settings = { uuid: "", online: false}
     gameState = GameState.getInstance();
     cardManager = CardDeckMannager.getInstance();
+    worker = QueryableWorker.getInstance();
     player_1_board: any;
     player_2_board: any;
     player_hand: any;
@@ -45,10 +47,10 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.player_hand = new Hand({
             scene: this, 
             children: [
-                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
-                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
-                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
-                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")})
+                new dragableCard({scene: this, id: 1}),
+                new dragableCard({scene: this, id: 1}),
+                new dragableCard({scene: this, id: 1}),
+                new dragableCard({scene: this, id: 1})
             ]
         });
         this.player_1_board = new BoardObject({ 
@@ -105,6 +107,8 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
      * @param {boolean} [active=true]
      * @returns {KevinOnline.Objects.BoardCard}
      * @memberof GameScene
+     * 
+     * Used for the ondrop event: ln 96 mainScene.ts
      */
     newCard(owner: KevinOnline.Owner, dropZone: KevinOnline.Objects.DropZone, card_id: number, active: boolean = true): KevinOnline.Objects.BoardCard{
         switch (owner) {
@@ -117,13 +121,15 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         }
     }
     /**
-     *  Crates a set number of cards from a given dropzone
+     *  Creates a set number of cards from a given dropzone
      *
      * @param {KevinOnline.Owner} owner
      * @param {number} card_id
      * @param {number} zone_id
      * @param {number} [amount=1]
      * @memberof GameScene
+     * 
+     * used from card ablity 
      */
     spawnCard(owner: KevinOnline.Owner, card_id:number, zone_id:number, amount: number = 1){
         switch (owner) {

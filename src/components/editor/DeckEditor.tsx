@@ -1,14 +1,18 @@
 import React,{useState, useEffect} from 'react';
-import {Button, Select, Input, Card, Tag} from 'shineout';
+import {Button, Select, Input, Card, Tag, Modal} from 'shineout';
 
 
 import CardJson from '../../game/utils/Loader';
+import { routeTo } from '../../utils/history';
 
-
+interface IDeck{
+    id: number;
+    amount: number;
+}
 export default function DeckEditor(){
-    document.title = "Kevin Online - Deck Editor";
+    const [modal, setModel] = useState(false);
     const [cards, setCards] = useState<KevinOnline.CardData[]>([]);
-    const [deck,setDeck] = useState([{id:0, amount: 1}]);
+    const [deck,setDeck] = useState<IDeck[]>([]);
     const [cardCount, setCardCount] = useState<number>(0);
     const [viewCard,setViewCard] = useState({});
     const [isDeckSaved,setIsDeckSaved] = useState(false);
@@ -21,15 +25,30 @@ export default function DeckEditor(){
             setCardCount(count);
             return count;
     }
+    const exit = (save: boolean = false)=>{
+        routeTo("/",{});
+    }
     useEffect(()=>{
+        document.title = "Kevin Online - Deck Editor";
         CardJson.getInstance().fetch().then(data=>{
             setCards(data.cards);
         });
         calcCount();
     },[]);
     return <div id="editor">
+            <Modal title="You have a unsaved deck!" visible={modal} onClose={()=>setModel(false)} footer={
+                [<Button onClick={()=>exit()}>Save and Exit</Button>,
+                <Button onClick={()=>exit()}>Exit</Button>]}>
+                    Do you want to save the changes?
+                </Modal>
             <div id="card-viewer"> 
-                <Button type="secondary" onClick={()=>window.history.back()}>Exit</Button>
+                <Button type="secondary" onClick={()=>{
+                    if(!isDeckSaved){
+                        setModel(true);
+                    }else{
+                        exit();
+                    }
+                }}>Exit</Button>
                 <canvas></canvas>
             </div>
             <div id="card-selection">

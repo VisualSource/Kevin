@@ -36,11 +36,11 @@
             },
             "abilities":[
                 {
-                    "type":"discard_cards_in_hand",
+                    "type":"swap_cards_in_hand",
                     "ability_int": 1,
                     "trigger": "on_drop",
                     "after_use_state":"remain_in_play",
-                    "affecting_player":"self",
+                    "affecting_player":"self_and_opponent",
                     "partice":"",
                     "sound_cue":""
                 }
@@ -91,10 +91,10 @@
             },
             "abilities":[
                 {
-                    "type":"discard_cards_in_hand",
+                    "type":"swap_cards_in_hand",
                     "ability_int": 1,
                     "trigger": "on_drop",
-                    "after_use_state":"remain_in_play",
+                    "after_use_state":"single_use_send_to_graveyard_after_ability",
                     "affecting_player":"self",
                     "partice":"",
                     "sound_cue":""

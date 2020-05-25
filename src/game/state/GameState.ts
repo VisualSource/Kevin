@@ -48,13 +48,13 @@ export default class GameState{
             this.emmiter.emit("start_of_turn",{owner:"opponent"});
             this.selfProxy.turns++;
             this.OverlayProxy.turnOwner = "opponent";
-            this.worker.send("turn_change",{ test: "A"});
+            this.worker.send("turn_change",{ test: "self"});
         }else{
             this.emmiter.emit("end_of_turn",{owner:"opponent"});
             this.emmiter.emit("start_of_turn",{owner:"self"});
             this.oppoentProxy.turns++;
             this.OverlayProxy.turnOwner = "self";
-            this.worker.send("turn_change",{ test:"B"});
+            this.worker.send("turn_change",{ test: "opponent"});
         }
     }
 }

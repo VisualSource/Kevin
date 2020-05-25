@@ -3,19 +3,19 @@ import dragableCard from './cards/dragableCard';
 import {clamp,lerp,select} from '../utils/Math';
 import {CardDeckMannager} from '../utils/Loader';
 export default class Hand extends GameObjects.Group implements KevinOnline.Objects.Hand {
-    cards_in_hand = 0;
-    max_cards_in_hand = 30;
-    fly_in_direction: boolean = true;
-    rotate_cards_to_offset: boolean = true;
-    card_offset: number = 0;
-    rotation_distance_scale_factor: number = 0.15;
-    radius_offset: number = -0.05;
-    card_spacing = 250;
-    dynamic_spacing: boolean = true;
-    dynamic_spacing_max_offset: number = 100;
-    screenOffestX: number = window.innerWidth/2;
-    screenOffestY: number = -window.innerHeight+100;
-    card_scale: number = 1;
+    public cards_in_hand: number = 0;
+    public max_cards_in_hand: number = 30;
+    public fly_in_direction: boolean = true;
+    public rotate_cards_to_offset: boolean = true;
+    public card_offset: number = 0;
+    public rotation_distance_scale_factor: number = 0.15;
+    public radius_offset: number = -0.05;
+    public card_spacing: number = 250;
+    public dynamic_spacing: boolean = true;
+    public dynamic_spacing_max_offset: number = 100;
+    public screenOffestX: number = window.innerWidth/2;
+    public screenOffestY: number = -window.innerHeight+100;
+    public card_scale: number = 1;
     constructor({scene, children, config}: KevinOnline.Params.IHandGroup){
         super(scene, children);
         this.cards_in_hand = config?.cards_in_hand ?? 0;
@@ -34,7 +34,7 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         scene.add.existing(this);
         this.init();
     }
-    getCardPosistion(card_loop_index: number = 0){
+    private getCardPosistion(card_loop_index: number = 0){
         const a = this.cards_in_hand/this.max_cards_in_hand;
         const b = lerp(this.dynamic_spacing_max_offset,this.card_spacing,a);
         const c = clamp(this.card_spacing,this.dynamic_spacing_max_offset,b);
@@ -54,43 +54,75 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         const q = select(0.0,select(select(m,p,this.fly_in_direction),select(m,p,this.fly_in_direction),card_loop_index >= f),this.rotate_cards_to_offset) * -1.0;
         return {transialtion:{y: l, x: n}, angle: q}
     }
-    calcCardPosistion(){
+    private calcCardPosistion(){
         this.children.entries.forEach((data,i: number)=>{
             const ps = this.getCardPosistion(i);
             (data as KevinOnline.Objects.DragableCard).x = ps.transialtion.x;
             (data as KevinOnline.Objects.DragableCard).y = ps.transialtion.y;
             (data as KevinOnline.Objects.DragableCard).setAngle(ps.angle);
             (data as KevinOnline.Objects.DragableCard).handPosition = ps;
+            (data as KevinOnline.Objects.DragableCard).setDepth(ps.angle);
         });
     }
     init(){
         this.cards_in_hand = this.children.entries.length;
         this.calcCardPosistion();
     }
-    addCard(card: KevinOnline.Objects.DragableCard){
+    public addCard(card: KevinOnline.Objects.DragableCard): this{
         this.add(card);
         this.init();
+        return this;
     }
-    removeCard(card: KevinOnline.Objects.DragableCard){
+    public removeCard(card: KevinOnline.Objects.DragableCard): this{
         this.remove(card, true, true);
         this.init();
+        return this;
     }
-    drawCard(owner: KevinOnline.Owner){
+    public getCardList(): number[]{
+        const cards = this.getChildren();
+        return cards.map((card)=>{
+            return (card as KevinOnline.Objects.DragableCard).cardData.index;
+        });
+    
+    }
+    public drawCard(owner: KevinOnline.Owner): this{
         const card = new dragableCard({scene: this.scene, id:CardDeckMannager.getInstance().getRandomCard(owner)});
         this.addCard(card); 
+        return this;
     }
-    discardHand(){
+    public addCardById(id: number, hidden: boolean = false, canInteract: boolean = true): this{
+        const card = new dragableCard({scene: this.scene, id , canInteract, hidden});
+        this.addCard(card); 
+        return this;
+    }
+    public discardCard(amount: number = 1): this{
         const cards = this.getChildren();
-        for (let i = 0; i < cards.length; i++) {
+        if(amount > cards.length) return this;
+        for (let i = 0; i <= amount; i++) {
             this.remove(cards[i], true, true);
         }
-        setTimeout(()=>{
-            const cardsa = this.getChildren();
-            for (let i = 0; i < cardsa.length; i++) {
-                this.remove(cardsa[i], true, true);
-                this.init()
-            }
-        },3);
         this.init();
+        return this;
+    }
+    public discardAll(): this{
+        const main = ()=>{
+            const cards = this.getChildren();
+            for (let i = 0; i <= cards.length; i++) {
+                this.remove(cards[i], true, true);
+            }
+            this.init();
+        }
+        setTimeout(()=>{
+            main();
+        },1);
+        main();
+        
+        return this;
     }
 }
+
+/**
+ * 
+ * 
+ * 
+ */
