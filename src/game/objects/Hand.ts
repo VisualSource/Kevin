@@ -91,8 +91,7 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         return this;
     }
     public addCardById(id: number, hidden: boolean = false, canInteract: boolean = true): this{
-        const card = new dragableCard({scene: this.scene, id , canInteract, hidden});
-        this.addCard(card); 
+        this.addCard(new dragableCard({scene: this.scene, id, canInteract, hidden})); 
         return this;
     }
     public discardCard(amount: number = 1): this{
@@ -105,18 +104,8 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         return this;
     }
     public discardAll(): this{
-        const main = ()=>{
-            const cards = this.getChildren();
-            for (let i = 0; i <= cards.length; i++) {
-                this.remove(cards[i], true, true);
-            }
-            this.init();
-        }
-        setTimeout(()=>{
-            main();
-        },1);
-        main();
-        
+        this.clear(true,true);
+        this.init();
         return this;
     }
 }

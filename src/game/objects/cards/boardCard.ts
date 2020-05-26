@@ -13,7 +13,7 @@ function CreateAblites(data: KevinOnline.CardAbilities[], sprite: BoardCard){
    });
 }
 function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
-    sprite.emit("single_use_send_to_graveyard_before_ability");
+   if(data.after_use_state === "single_use_to_graveyard_before_ability") sprite.emit("single_use_send_to_graveyard_before_ability");
     const state = GameState.getInstance();
     switch (data.type) {
         case "draw_card":{
@@ -154,15 +154,44 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             break;
         }
         case "pickup_first_creature_in_graveyard_to_board":{
+            switch (data.affecting_player) {
+                case "self":
+                    sprite.GameScene.graveyard_a.addCardToBoard(data.affecting_player);
+                    break;
+                case "opponent":
+                    sprite.GameScene.graveyard_b.addCardToBoard(data.affecting_player);
+                    break;
+                case "self_and_opponent":
+                    sprite.GameScene.graveyard_a.addCardToBoard("self");
+                    sprite.GameScene.graveyard_b.addCardToBoard("opponent");
+                default:
+                    break;
+            }
             sprite.actionPoints--;
             break;
         }
         case "pickup_first_creature_in_graveyard_to_hand":{
+            switch (data.affecting_player) {
+                case "self":
+                    sprite.GameScene.graveyard_a.addCardToHand(data.affecting_player);
+                    break;
+                case "opponent":
+                    sprite.GameScene.graveyard_b.addCardToHand(data.affecting_player);
+                    break;
+                case "self_and_opponent":
+                    sprite.GameScene.graveyard_a.addCardToHand(data.affecting_player);
+                    sprite.GameScene.graveyard_b.addCardToHand(data.affecting_player);
+                    break;
+                default:
+                    break;
+            }
             sprite.actionPoints--;
-              //effect hand
             break;
         }
         case "possess_opponents_card":{
+            const poss = sprite.GameScene.player_2_board.activeSpots()[0];
+            console.log(poss);
+            
             sprite.actionPoints--;
             break;
         }
@@ -172,16 +201,12 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             const uh = scene.player_hand.getCardList();
             scene.player_hand.discardAll();
             scene.opponent_hand.discardAll();
-            
-            setTimeout(()=>{
-                oh.forEach(value=>{
-                    scene.player_hand.addCardById(value);
-                });
-                uh.forEach(value=>{
-                    scene.opponent_hand.addCardById(value, true, false);
-                });
-            },2);
-
+            oh.forEach(value=>{
+                scene.player_hand.addCardById(value);
+            });
+            uh.forEach(value=>{
+                scene.opponent_hand.addCardById(value, true, false);
+            });
             sprite.actionPoints--;
             break;
         }
@@ -189,7 +214,7 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             console.log("Not implemented");
             break;
     }
-    sprite.emit("single_use_send_to_graveyard_after_ability");
+    if(data.after_use_state === "single_use_to_graveyard_after_ability") sprite.emit("single_use_send_to_graveyard_after_ability");
 }
 //TODO when card moves to graveyard, set dropzone active to false;
 export default class BoardCard extends GameObjects.Sprite implements KevinOnline.Objects.BoardCard{
@@ -218,7 +243,7 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
         this.on("single_use_send_to_graveyard_after_ability",()=>{
             this.toGraveyard();
         });
-        this.on("die",(spr: BoardCard)=>{
+        this.on("die",()=>{
            this.toGraveyard();
         });
         this.on('healthchange', function (spr: BoardCard, amount: number, health: number, maxHealth: number) {
@@ -257,7 +282,7 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     }
     damageCard(damage: number, index:number, owner: KevinOnline.Owner){
         this.damage(damage);
-        this.emit("takes_damage", {card_index: index, owner});//emit for ablity
+        this.emit("takes_damage", {index, owner});//emit for ablity
     }
     get GameScene(){
         return this.scene as KevinOnline.Objects.MainGameScene;
@@ -268,9 +293,22 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
             this.scene.sound.play(this.cardData.health.sound_cue_death);
         }
         if(this.cardData.health.death_particle !== ""){}
-        this.setPosition(this.graveyard.x,this.graveyard.y);
         this.setActive(false);
-        return this;
+        this.scene.tweens.add({
+            targets: this,
+            x: {from: this.x, to: this.graveyard.x},
+            y: { from: this.y, to: this.graveyard.y},
+            duration: 100,
+            onComplete: ()=>{
+               this.destroy();
+            }
+        });
+        if(this.owner === "self"){
+            (this.scene as KevinOnline.Objects.MainGameScene).graveyard_a.addCard(this.cardData.index, this.getData("dropzone_id"),this.owner);
+        }else{
+            (this.scene as KevinOnline.Objects.MainGameScene).graveyard_b.addCard(this.cardData.index, this.getData("dropzone_id"),this.owner);
+        }
+        //this.setPosition(this.graveyard.x,this.graveyard.y);;
     }
     
 

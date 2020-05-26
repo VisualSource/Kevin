@@ -36,11 +36,11 @@
             },
             "abilities":[
                 {
-                    "type":"swap_cards_in_hand",
+                    "type":"possess_opponents_card",
                     "ability_int": 1,
                     "trigger": "on_drop",
                     "after_use_state":"remain_in_play",
-                    "affecting_player":"self_and_opponent",
+                    "affecting_player":"self",
                     "partice":"",
                     "sound_cue":""
                 }
@@ -85,7 +85,7 @@
             },
             "health":{
                 "health": 1,
-                "life_expectancy": 10,
+                "life_expectancy": 2,
                 "death_particle": "",
                 "sound_cue_death":""
             },

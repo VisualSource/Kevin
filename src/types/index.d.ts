@@ -89,11 +89,14 @@ declare namespace KevinOnline{
             drawCard(owner: KevinOnline.Owner)
             discardCard(amount?: number): void;
             discardAll(): void;
+            init(): void;
             public getCardList(): number[];
             public addCardById(id: number,hidden: boolean = false, canInteract: boolean = true): this;
            
         }
         interface MainGameScene extends Phaser.Scene{
+            graveyard_a;
+            graveyard_b;
             settings: Settings;
             worker: QueryableWorker;
             player_hand: Hand;

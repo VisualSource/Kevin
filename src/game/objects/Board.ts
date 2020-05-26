@@ -56,9 +56,10 @@ export default class BoardObject extends GameObjects.Group{
             const zone = getAviableSlot();
             if(zone !== null){
                 const card = (this.scene as KevinOnline.Objects.MainGameScene).newCard(this.owner,zone,card_id, false);
+                card.owner = zone.getData("owner");
                 card.actionPoints = 0;
             }else{
-                console.log("No space on board");
+                console.error("No space on board");
             }
         }
     }

@@ -17,6 +17,7 @@ export default class CardGroup extends GameObjects.Group implements KevinOnline.
                 graveyard: dropzone.graveyard,
                 dropzone_id: dropzone.id
             });
+            card.owner = dropzone.getData("owner");
             this.add(card);
             if(setActive) dropzone.setData("active", true);
             return card;

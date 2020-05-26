@@ -1,6 +1,7 @@
 import {Scene} from 'phaser';
 import dragableCard from '../objects/cards/dragableCard';
 import CardGroup from '../objects/cards/CardGroup';
+import Graveyard from '../objects/Graveyard';
 import Hand from '../objects/Hand';
 import BoardObject from '../objects/Board';
 import GameState from '../state/GameState';
@@ -17,6 +18,8 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
     opponent_hand: any;
     player_1_board_c: any;
     player_2_board_c: any;
+    graveyard_a: any;
+    graveyard_b: any;
     constructor(){
         super("main");
     }
@@ -25,9 +28,17 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.settings.online = data.settings.online as any === "true" ? true : false;
     }
     preload(){
-        this.gameState.showOverlay.proxy.show = true;
+        this.gameState.OverlayProxy.show = true;
     }
     create(){
+        this.graveyard_a = new Graveyard(this,{
+            x: 300 + 1400,
+            y: 600
+        } );
+        this.graveyard_b = new Graveyard(this,{
+            x: 0,
+            y: 300
+        });
         this.opponent_hand = new Hand({
             scene: this,
             config: {
@@ -47,10 +58,10 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.player_hand = new Hand({
             scene: this, 
             children: [
-                new dragableCard({scene: this, id: 1}),
-                new dragableCard({scene: this, id: 1}),
-                new dragableCard({scene: this, id: 1}),
-                new dragableCard({scene: this, id: 1})
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")}),
+                new dragableCard({scene: this, id: this.cardManager.getRandomCard("self")})
             ]
         });
         this.player_1_board = new BoardObject({ 
@@ -91,7 +102,9 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
             gameObject.setAngle(gameObject.handPosition.angle);
         });
        this.input.on('drop',  (pointer: any, gameObject: KevinOnline.Objects.DragableCard, dropZone: KevinOnline.Objects.DropZone)=>{
-           if(gameObject.cardData.placement_settings.mana_cost <= this.gameState.selfProxy.mana && !dropZone.getData("active") && (dropZone.getData("owner") === gameObject.cardData.placement_settings.owner || gameObject.cardData.placement_settings.owner === "self_and_opponent")){
+           if(gameObject.cardData.placement_settings.mana_cost <= this.gameState.selfProxy.mana && 
+              !dropZone.getData("active") && 
+              (dropZone.getData("owner") === gameObject.cardData.placement_settings.owner || gameObject.cardData.placement_settings.owner === "self_and_opponent")){
                 this.gameState.selfProxy.mana -= gameObject.cardData.placement_settings.mana_cost;
                 this.newCard(dropZone.getData("owner") as KevinOnline.Owner,dropZone,gameObject.cardData.index)
                 this.player_hand.removeCard(gameObject);
