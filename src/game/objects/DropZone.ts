@@ -13,10 +13,5 @@ export default class DropZone extends GameObjects.Zone implements KevinOnline.Ob
         this.setData("active",false);
         scene.add.existing(this);
         scene.input.enableDebug(this);
-        this.emiter.on("empty",(data: any)=>{
-            if(data.id === this.id){
-
-            }
-        });
     }
 }

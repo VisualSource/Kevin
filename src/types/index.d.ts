@@ -51,13 +51,70 @@ declare namespace KevinOnline{
         }
     }
     namespace Objects{
-        interface CardGroup extends Phaser.GameObjects.Group{}
+        interface CardGroup extends Phaser.GameObjects.Group{
+            /**
+             * Gets the card at the dropzone of the give id.
+             *
+             * @param {number} id
+             * @returns {BoardCard}
+             * @memberof CardGroup
+             */
+            getCardByDropZone(id: number): BoardCard;
+            /**
+             * Adds a card to a dropzone.
+             *
+             * @param {KevinOnline.Objects.DropZone} dropzone
+             * @param {number} index
+             * @param {boolean} [setActive=true]
+             * @returns {BoardCard}
+             * @memberof CardGroup
+             */
+            addCard(dropzone: KevinOnline.Objects.DropZone, index: number, setActive: boolean = true): BoardCard;
+            /**
+             * Removes a card 
+             *
+             * @param {BoardCard} card
+             * @memberof CardGroup
+             */
+            removeCard(card: BoardCard): void;
+        }
         interface BoardCard extends Phaser.GameObjects.Sprite{
+            /**
+             * The card data. Ex name, index, other.
+             * @type {CardData}
+             * @memberof BoardCard
+             */
             cardData: CardData;
+            /** 
+             * How long the card will be on the board before being moved to graveyard.
+             * @type {number}
+             * @memberof BoardCard
+             */
             lifeSpan: number;
+            /**
+             * The card owner.
+             * @type {Owner}
+             * @memberof BoardCard
+             */
             owner: Owner;
+            /**
+             * The amount of damage the card can deal.
+             * @type {number}
+             * @memberof BoardCard
+             */
             attack: number;
+            /**
+             * How many actions the card can do before it cant do anything.
+             * @type {number}
+             * @memberof BoardCard
+             */
             actionPoints: number;
+            /**
+             * The location of the graveyard
+             * @type {IPosistion}
+             * @memberof BoardCard
+             */
+            graveyard: IPosistion;
         }
         interface DragableCard extends Phaser.GameObjects.Sprite{
             handPosition:{
@@ -107,7 +164,52 @@ declare namespace KevinOnline{
             player_2_board_c: any;
             gameState: any;
             spawnCard(owner: KevinOnline.Owner | "self_and_opponent", card_id:number, zone_id:number, amount: number = 1);
-            newCard(owner: KevinOnline.Owner, dropZone: KevinOnline.Objects.DropZone, card_id: number, active: boolean = true): KevinOnline.Objects.BoardCard
+            newCard(owner: KevinOnline.Owner, dropZone: KevinOnline.Objects.DropZone, card_id: number, active: boolean = true): KevinOnline.Objects.BoardCard;
+            ownerInvert(ogOwner: KevinOnline.Owner): KevinOnline.Owner;
+        }
+        interface BoardObject extends Phaser.GameObjects.Group{
+            /**
+             * The owner of the card
+             * @type {KevinOnline.Owner}
+             * @memberof BoardObject
+            */
+            owner: Owner;
+            /**
+             * Object holding where the graveyard should be.
+             * @type {KevinOnline.IPosistion}
+             * @memberof BoardObject
+            */
+            graveyard: IPosistion;
+            /**
+             * Returns all unactive dropzones.
+             *
+             * @returns {DropZone[]} Dropzone[]
+             * @memberof BoardObject
+            */
+            unactiveSpots(): DropZone[];
+            /**
+             * Returns all active dropzones.
+             *
+             * @returns {DropZone[]} Dropzone[]
+             * @memberof BoardObject
+            */
+            activeSpots(): DropZone[];
+            /**
+             * Gets the dropzone with the the given id.
+             *
+             * @param {number} id
+             * @returns {DropZone}
+             * @memberof BoardObject
+             */
+            getSlot(id: number): DropZone;
+            /**
+             * Spawn a card a given dropzone and a set number of cards to create. 
+             *  Good for duplcating cards
+             *
+             * @param {{card_id: number,zone_id:number,amount:number}} {card_id, zone_id, amount = 1}
+             * @memberof BoardObject
+             */
+            spawn({card_id, zone_id, amount = 1}:{card_id: number,zone_id:number,amount:number}): this
         }
     }
     interface IPosistion {
@@ -188,9 +290,16 @@ declare namespace Phaser{
      namespace GameObjects{
         interface Sprite{
             /**
+             * @requires PhaserHealth
              * Kill sprite
              */
-            kill(): void
+            kill(): void;
+            /**
+             *
+             * @requires PhaserHealth
+             * @param {number} value
+             * @memberof Sprite
+             */
             damage(value: number): void
         }
     }

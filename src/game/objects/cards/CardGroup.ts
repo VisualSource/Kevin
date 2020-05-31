@@ -22,4 +22,18 @@ export default class CardGroup extends GameObjects.Group implements KevinOnline.
             if(setActive) dropzone.setData("active", true);
             return card;
     }
+    getCardByDropZone(id: number): BoardCard{
+        return this.getChildren().find((value=>value.getData("dropzone_id") === id)) as BoardCard;
+    }
+    removeCard(card: BoardCard){
+        if(card.owner === "self"){
+            const zone = ((this.scene as KevinOnline.Objects.MainGameScene).player_1_board as KevinOnline.Objects.BoardObject).getSlot(card.getData("dropzone_id")) as KevinOnline.Objects.DropZone;
+            zone.setData("active",false);
+        }else{
+            const zone = ((this.scene as KevinOnline.Objects.MainGameScene).player_2_board as KevinOnline.Objects.BoardObject).getSlot(card.getData("dropzone_id")) as KevinOnline.Objects.DropZone;
+            zone.setData("active",false);
+        }
+        this.remove(card, true, true);
+
+    }
 }

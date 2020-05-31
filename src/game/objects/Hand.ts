@@ -2,6 +2,14 @@ import {GameObjects} from 'phaser';
 import dragableCard from './cards/dragableCard';
 import {clamp,lerp,select} from '../utils/Math';
 import {CardDeckMannager} from '../utils/Loader';
+/**
+ * Class for handling the player hand
+ *
+ * @export
+ * @class Hand
+ * @extends {GameObjects.Group}
+ * @implements {KevinOnline.Objects.Hand}
+ */
 export default class Hand extends GameObjects.Group implements KevinOnline.Objects.Hand {
     public cards_in_hand: number = 0;
     public max_cards_in_hand: number = 30;
@@ -16,6 +24,11 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
     public screenOffestX: number = window.innerWidth/2;
     public screenOffestY: number = -window.innerHeight+100;
     public card_scale: number = 1;
+    /**
+     * Creates an instance of Hand.
+     * @param {KevinOnline.Params.IHandGroup} {scene, children, config}
+     * @memberof Hand
+     */
     constructor({scene, children, config}: KevinOnline.Params.IHandGroup){
         super(scene, children);
         this.cards_in_hand = config?.cards_in_hand ?? 0;
@@ -34,6 +47,14 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         scene.add.existing(this);
         this.init();
     }
+    /**
+     * calcs the angle and position for a card
+     *
+     * @private
+     * @param {number} [card_loop_index=0]
+     * @returns
+     * @memberof Hand
+     */
     private getCardPosistion(card_loop_index: number = 0){
         const a = this.cards_in_hand/this.max_cards_in_hand;
         const b = lerp(this.dynamic_spacing_max_offset,this.card_spacing,a);
@@ -54,6 +75,12 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         const q = select(0.0,select(select(m,p,this.fly_in_direction),select(m,p,this.fly_in_direction),card_loop_index >= f),this.rotate_cards_to_offset) * -1.0;
         return {transialtion:{y: l, x: n}, angle: q}
     }
+    /**
+     * Calcs the angles and position for every card in hand
+     *
+     * @private
+     * @memberof Hand
+     */
     private calcCardPosistion(){
         this.children.entries.forEach((data,i: number)=>{
             const ps = this.getCardPosistion(i);
@@ -64,20 +91,45 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
             (data as KevinOnline.Objects.DragableCard).setDepth(ps.angle);
         });
     }
+    /**
+     * Sets the current cards in hand and calcs angle, and position for cards in hand
+     *
+     * @memberof Hand
+     */
     init(){
         this.cards_in_hand = this.children.entries.length;
         this.calcCardPosistion();
     }
+    /**
+     * Add a card to hand and updates hand to display the change
+     *
+     * @param {KevinOnline.Objects.DragableCard} card
+     * @returns {this}
+     * @memberof Hand
+     */
     public addCard(card: KevinOnline.Objects.DragableCard): this{
         this.add(card);
         this.init();
         return this;
     }
+    /**
+     * Removes a card and updates hand to display change
+     *
+     * @param {KevinOnline.Objects.DragableCard} card
+     * @returns {this}
+     * @memberof Hand
+     */
     public removeCard(card: KevinOnline.Objects.DragableCard): this{
         this.remove(card, true, true);
         this.init();
         return this;
     }
+    /**
+     * Returns all current cards in hand as their index type.
+     *
+     * @returns {number[]}
+     * @memberof Hand
+     */
     public getCardList(): number[]{
         const cards = this.getChildren();
         return cards.map((card)=>{
@@ -85,15 +137,38 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         });
     
     }
+    /**
+     * Add a new random card from deck to the hand and updates to display change
+     *
+     * @param {KevinOnline.Owner} owner
+     * @returns {this}
+     * @memberof Hand
+     */
     public drawCard(owner: KevinOnline.Owner): this{
         const card = new dragableCard({scene: this.scene, id:CardDeckMannager.getInstance().getRandomCard(owner)});
         this.addCard(card); 
         return this;
     }
+    /**
+     * Similer to "addCard" but card is added by spesifing a card id
+     *
+     * @param {number} id
+     * @param {boolean} [hidden=false]
+     * @param {boolean} [canInteract=true]
+     * @returns {this}
+     * @memberof Hand
+     */
     public addCardById(id: number, hidden: boolean = false, canInteract: boolean = true): this{
         this.addCard(new dragableCard({scene: this.scene, id, canInteract, hidden})); 
         return this;
     }
+    /**
+     * Discard a amount of cards from hand 
+     *
+     * @param {number} [amount=1]
+     * @returns {this}
+     * @memberof Hand
+     */
     public discardCard(amount: number = 1): this{
         const cards = this.getChildren();
         if(amount > cards.length) return this;
@@ -103,6 +178,12 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
         this.init();
         return this;
     }
+    /**
+     * Discards all cards in the hand
+     *
+     * @returns {this}
+     * @memberof Hand
+     */
     public discardAll(): this{
         this.clear(true,true);
         this.init();
@@ -110,8 +191,3 @@ export default class Hand extends GameObjects.Group implements KevinOnline.Objec
     }
 }
 
-/**
- * 
- * 
- * 
- */

@@ -92,6 +92,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
             }
         });
         this.player_2_board_c = new CardGroup({scene: this});
+        this.player_2_board_c.addCard(this.player_2_board.getSlot(0),1);
         this.input.on('drag', function (pointer: any, gameObject: KevinOnline.Objects.DragableCard) {
             gameObject.setAngle(0);
             gameObject.x = pointer.x;
@@ -157,6 +158,13 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
             default:
                 console.error("Owner setting not supported");
                 break;
+        }
+    }
+    ownerInvert(ogOwner: KevinOnline.Owner): KevinOnline.Owner{
+        if(ogOwner === "self"){
+            return "opponent";
+        }else{
+            return "self";
         }
     }
 }
