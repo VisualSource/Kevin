@@ -1,3 +1,9 @@
+=flexColumn 
+    display: flex 
+    flex-direction: column
+    justify-content: center 
+    align-items: center 
+    align-content: center
 html,body 
     height: 100vh 
     margin: 0
@@ -56,7 +62,7 @@ canvas
 #play
     display: flex
     > main 
-        width: 100%
+        width: calc(100vw - 14rem)
         height: 100vh
         >div#play-home
             width: 100%
@@ -122,11 +128,7 @@ canvas
                     left: 1310px 
                     border: solid 1px rgba(60,58,116,1.0)
                 > div#right-profile
-                    display: flex 
-                    flex-direction: column
-                    justify-content: center 
-                    align-items: center 
-                    align-content: center
+                    +flexColumn
                     background: rgba(101,99,152,1.0)
                     top: 290px 
                     height: 500px 
@@ -137,11 +139,7 @@ canvas
                     border: solid 1px rgba(60,58,116,1.0)
                     box-sizing: border-box 
                 > div#left-profile
-                    display: flex 
-                    flex-direction: column
-                    justify-content: center 
-                    align-items: center 
-                    align-content: center
+                    +flexColumn
                     background: rgba(101,99,152,1.0)
                     top: 290px 
                     height: 500px 
@@ -152,11 +150,7 @@ canvas
                     border: solid 1px rgba(60,58,116,1.0)
                     box-sizing: border-box 
                 > div#center
-                    display: flex 
-                    flex-direction: column
-                    justify-content: center 
-                    align-items: center 
-                    align-content: center
+                    +flexColumn
                     background: white 
                     box-sizing: border-box 
                     border: solid 1px rgba(60,58,166,1.0)
@@ -220,6 +214,13 @@ canvas
         > canvas 
             width: 50vw
             background: #F1F8FE
+        > div.so-card.so-card-shadow
+                position: relative 
+                z-index: 5
+                bottom: 12rem 
+                width: 20%
+                left: 35vw
+                
         > button 
             color: #43425D
             border-color: #43425D

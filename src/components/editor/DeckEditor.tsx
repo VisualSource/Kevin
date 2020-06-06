@@ -1,6 +1,6 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState, useEffect, createRef} from 'react';
 import {Button, Select, Input, Card, Tag, Modal} from 'shineout';
-
+import {init, event} from './viewer';
 
 import CardJson from '../../game/utils/Loader';
 import { routeTo } from '../../utils/history';
@@ -10,11 +10,12 @@ interface IDeck{
     amount: number;
 }
 export default function DeckEditor(){
+    const cv = createRef<HTMLCanvasElement>();
     const [modal, setModel] = useState(false);
     const [cards, setCards] = useState<KevinOnline.CardData[]>([]);
     const [deck,setDeck] = useState<IDeck[]>([]);
     const [cardCount, setCardCount] = useState<number>(0);
-    const [viewCard,setViewCard] = useState({});
+    const [viewCard,setViewCard] = useState<KevinOnline.CardData>();
     const [isDeckSaved,setIsDeckSaved] = useState(false);
     const [deckName, setDeckName] = useState("");
     const calcCount = () => {
@@ -34,6 +35,7 @@ export default function DeckEditor(){
             setCards(data.cards);
         });
         calcCount();
+        if(cv.current) init(cv.current);
     },[]);
     return <div id="editor">
             <Modal title="You have a unsaved deck!" visible={modal} onClose={()=>setModel(false)} footer={
@@ -49,7 +51,18 @@ export default function DeckEditor(){
                         exit();
                     }
                 }}>Exit</Button>
-                <canvas></canvas>
+                <canvas ref={cv}></canvas>
+                {
+                    viewCard !== undefined ? 
+                    <Card shadow>
+                        <Card.Body>
+                            <h6>{viewCard?.rarity}</h6>
+                            <h2>{viewCard.name}</h2>
+                            <p>{viewCard.description}</p>
+                        </Card.Body>
+                    </Card> 
+                    : null
+                }
             </div>
             <div id="card-selection">
                 <section id="finder">
@@ -95,7 +108,8 @@ export default function DeckEditor(){
                                                     
                                                     }}>Add</Button>
                                                     <Button type="link" onClick={()=>{
-                                                        setViewCard(deck[card.index]);
+                                                        event.emit("restart",cards[card.index]);
+                                                        setViewCard(cards[card.index]);
                                                     }}>View</Button>
                                                 </div>
                                           </Card>

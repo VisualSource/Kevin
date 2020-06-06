@@ -51,6 +51,7 @@
     "@types/react-router-dom": "^5.1.5",
     "babel-plugin-import": "^1.13.0",
     "node-sass": "^4.14.1",
+    "phaser3_gui_inspector": "^1.1.4",
     "typescript": "^3.8.3"
   }
 }

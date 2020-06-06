@@ -7,6 +7,9 @@ import BoardObject from '../objects/Board';
 import GameState from '../state/GameState';
 import {CardDeckMannager} from '../utils/Loader';
 import QueryableWorker from '../state/OpponentHander';
+
+
+import PhaserGUIAction from 'phaser3_gui_inspector';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
     settings: KevinOnline.Settings = { uuid: "", online: false}
     gameState = GameState.getInstance();
@@ -111,6 +114,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
                 this.player_hand.removeCard(gameObject);
             }
         });
+        PhaserGUIAction(this);
     }
     /**
      * Creates a new card at a given dropzone
@@ -161,10 +165,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         }
     }
     ownerInvert(ogOwner: KevinOnline.Owner): KevinOnline.Owner{
-        if(ogOwner === "self"){
-            return "opponent";
-        }else{
-            return "self";
-        }
+        if(ogOwner === "self")return "opponent";
+        return "self";
     }
 }

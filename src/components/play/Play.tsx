@@ -1,7 +1,7 @@
 import React,{useEffect, useState, useReducer, useCallback} from 'react';
 import useForceUpdate from 'use-force-update';
 import Sidenav from '../Sidenav';
-import {Button, Select, Image, Input, Message, Spin, Modal} from 'shineout';
+import {Button, Select, Image, Input, Message, Spin, Modal, Card} from 'shineout';
 import {routeTo,queryFromURI} from '../../utils/history';
 import {Utils} from 'phaser';
 import QueryableWorker from '../../game/state/OpponentHander';
@@ -205,18 +205,22 @@ function PlayHome(){
         </div>
     }
     return <div id="play-home">
-                <div className="select-play">
-                    <div className="select-art"></div>
-                   <div className="select-button">
-                     <Button type="link" onClick={()=>routeTo("/play/singleplayer",{})}>Singleplayer</Button>
-                   </div>
-                </div>
-                <div className="select-play">
-                    <div className="select-art"></div>
-                   <div className="select-button">
-                     <Button type="link" onClick={()=>setShowModal(true)}>Multiplayer</Button>
-                   </div>
-                </div>
+            <Card className="select-play">
+                <Card.Body className="select-art">
+
+                </Card.Body>
+                <Card.Footer className="select-button">
+                    <Button type="link" onClick={()=>routeTo("/play/singleplayer",{})}>Singleplayer</Button>
+                </Card.Footer>
+            </Card>
+            <Card className="select-play">
+                <Card.Body className="select-art">
+
+                </Card.Body>
+                <Card.Footer className="select-button">
+                    <Button type="link" onClick={()=>setShowModal(true)}>Multiplayer</Button>
+                </Card.Footer>
+            </Card>
                 <Modal visible={showModal} onClose={()=>setShowModal(false)} title="Start Multiplayer" footer={Footer()}>
                     <Input onChange={(value: any)=>{setCode(value)}} placeholder="enter a join code"></Input>
                 </Modal>
