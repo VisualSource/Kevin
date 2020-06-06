@@ -120,8 +120,8 @@
         }
     ],
     "assets":[
-        {"name":"default", "texture":"default_backing.webp"},
-        {"name":"pyro_kevin", "texture":"pyro_kevin.webp"},
-        {"name":"didnt_kevin", "texture":"didnt_kevin.png"}
+        {"name":"default", "texture":"assets/default_backing.webp"},
+        {"name":"pyro_kevin", "texture":"assets/pyro_kevin.webp"},
+        {"name":"didnt_kevin", "texture":"assets/didnt_kevin.png"}
     ]
 }

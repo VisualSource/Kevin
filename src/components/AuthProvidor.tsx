@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, createContext } from "react";
-import createAuth0Client from "@auth0/auth0-spa-js";
+import createAuth0Client, {Auth0Client} from "@auth0/auth0-spa-js";
 
 const DEFAULT_REDIRECT_CALLBACK = (event:any) => window.history.replaceState({}, document.title, window.location.pathname);
 //@ts-ignore
@@ -13,7 +13,7 @@ export const Auth0Provider = ({
   }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState({});
-    const [auth0Client, setAuth0] = useState();
+    const [auth0Client, setAuth0] = useState<Auth0Client>();
     const [loading, setLoading] = useState(true);
     const [popupOpen, setPopupOpen] = useState(false);
   
@@ -46,7 +46,6 @@ export const Auth0Provider = ({
         }
       };
       initAuth0();
-      // eslint-disable-next-line
     }, []);
 
     const loginWithPopup = async (params = {}) => {
