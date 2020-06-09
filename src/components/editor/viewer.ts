@@ -76,7 +76,7 @@ class EditorViewer extends Game{
                 //@ts-ignore
                 default: false
             },
-            version: "0.0.1",
+            version: "0.1.1-alpha",
             fps:{
                 min: 30,
                 target: 60

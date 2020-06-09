@@ -261,27 +261,17 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     constructor({scene, posistion,id, graveyard, dropzone_id}: KevinOnline.Params.IBoardCard){
         super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
+        CreateAblites(this.cardData.abilities,this);
+        this.attack = this.cardData.attack.damage;
         this.graveyard = graveyard;
         this.emmiter = EventDispatcher.getInstance();
-        this.setData("dropzone_id",dropzone_id);
-        this.attack = this.cardData.attack.damage;
-        CreateAblites(this.cardData.abilities,this);
-        this.setDisplaySize(this.cardData.deck_settings.screen_size.x,this.cardData.deck_settings.screen_size.y);
+        this.setData("dropzone_id",dropzone_id).setDisplaySize(this.cardData.deck_settings.screen_size.x,this.cardData.deck_settings.screen_size.y);
         PhaserHealth.AddTo(this, this.cardData.health.health, this.cardData.health.health);
         scene.add.existing(this);
         this.init();
-        this.on("single_use_send_to_graveyard_before_ability",()=>{
-            this.toGraveyard();
-        });
-        this.on("single_use_send_to_graveyard_after_ability",()=>{
-            this.toGraveyard();
-        });
-        this.on("die",()=>{
-           this.toGraveyard();
-        });
-        this.on('healthchange', function (spr: BoardCard, amount: number, health: number, maxHealth: number) {
-            // Health changed by ${amount}, now ${health}/${maxHealth}
-        });
+        this.on("single_use_send_to_graveyard_before_ability",()=>this.toGraveyard());
+        this.on("single_use_send_to_graveyard_after_ability",()=>this.toGraveyard());
+        this.on("die",()=>this.toGraveyard());
         this.emmiter.on("start_of_turn",(data: any)=>{
             if(data.owner === this.owner){
                 this.emit("start_of_turn");//emit for ablity
@@ -297,14 +287,12 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
             }
         });
        this.emmiter.on("end_of_turn",(data:any)=>{
-           if(data.owner === this.owner){
-            this.emit("end_of_turn");//emit for ablity
-           }
+           if(data.owner === this.owner)this.emit("end_of_turn");//emit for ablity
        });
     }
     /**
      * Card init. 
-     * Plays Sound entry cue/particle 
+     * Plays entry cue/particle 
      * @emits on_drop
      * @memberof BoardCard
      */
@@ -344,26 +332,22 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
      */
     toGraveyard(){
         this.emit("sent_to_graveyard");//emit for ablity
-        if(this.cardData.health.sound_cue_death !== ""){
-            this.scene.sound.play(this.cardData.health.sound_cue_death);
-        }
+        if(this.cardData.health.sound_cue_death !== "")this.scene.sound.play(this.cardData.health.sound_cue_death);
         if(this.cardData.health.death_particle !== ""){}
         this.setActive(false);
         this.scene.tweens.add({
             targets: this,
-            x: {from: this.x, to: this.graveyard.x},
+            x: { from: this.x, to: this.graveyard.x},
             y: { from: this.y, to: this.graveyard.y},
             duration: 100,
-            onComplete: ()=>{
-               this.destroy();
-            }
+            onComplete:()=>this.destroy()
+            
         });
         if(this.owner === "self"){
             (this.scene as KevinOnline.Objects.MainGameScene).graveyard_a.addCard(this.cardData.index, this.getData("dropzone_id"),this.owner);
         }else{
             (this.scene as KevinOnline.Objects.MainGameScene).graveyard_b.addCard(this.cardData.index, this.getData("dropzone_id"),this.owner);
         }
-        //this.setPosition(this.graveyard.x,this.graveyard.y);;
     }
     
 

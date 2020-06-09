@@ -21,7 +21,7 @@ function createConfig(canvas: HTMLCanvasElement): Types.Core.GameConfig{
             //@ts-ignore
             default: false
         },
-        version: "0.0.5-alpha-r2",
+        version: "0.2.5-alpha",
         fps:{
             min: 30,
             target: 60
