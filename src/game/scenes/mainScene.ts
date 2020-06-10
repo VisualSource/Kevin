@@ -11,7 +11,7 @@ import QueryableWorker from '../state/OpponentHander';
 
 import PhaserGUIAction from 'phaser3_gui_inspector';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
-    settings: KevinOnline.Settings = { uuid: "", online: false}
+    settings: KevinOnline.Settings = { uuid: "", online: false, debug: true}
     gameState = GameState.getInstance();
     cardManager = CardDeckMannager.getInstance();
     worker = QueryableWorker.getInstance();
@@ -29,6 +29,9 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
     init(data: any){
         this.settings.uuid = data.settings.uuid;
         this.settings.online = data.settings.online as any === "true" ? true : false;
+        if(this.settings.debug){
+            PhaserGUIAction(this);
+        }
     }
     preload(){
         this.gameState.OverlayProxy.show = true;
@@ -97,24 +100,30 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.player_2_board_c = new CardGroup({scene: this});
         this.player_2_board_c.addCard(this.player_2_board.getSlot(0),1);
         this.input.on('drag', function (pointer: any, gameObject: KevinOnline.Objects.DragableCard) {
-            gameObject.setAngle(0);
-            gameObject.x = pointer.x;
-            gameObject.y = pointer.y;
-        });
-        this.input.on('dragend', function (pointer: any, gameObject:KevinOnline.Objects.DragableCard) {
-            gameObject.setPosition(gameObject.handPosition.transialtion.x,gameObject.handPosition.transialtion.y);
-            gameObject.setAngle(gameObject.handPosition.angle);
-        });
-       this.input.on('drop',  (pointer: any, gameObject: KevinOnline.Objects.DragableCard, dropZone: KevinOnline.Objects.DropZone)=>{
-           if(gameObject.cardData.placement_settings.mana_cost <= this.gameState.selfProxy.mana && 
-              !dropZone.getData("active") && 
-              (dropZone.getData("owner") === gameObject.cardData.placement_settings.owner || gameObject.cardData.placement_settings.owner === "self_and_opponent")){
-                this.gameState.selfProxy.mana -= gameObject.cardData.placement_settings.mana_cost;
-                this.newCard(dropZone.getData("owner") as KevinOnline.Owner,dropZone,gameObject.cardData.index)
-                this.player_hand.removeCard(gameObject);
+            if(gameObject instanceof dragableCard){
+                gameObject.setAngle(0);
+                gameObject.x = pointer.x;
+                gameObject.y = pointer.y;
             }
         });
-        PhaserGUIAction(this);
+        this.input.on('dragend', function (pointer: any, gameObject:KevinOnline.Objects.DragableCard) {
+            if(gameObject instanceof dragableCard){
+                gameObject.setPosition(gameObject.handPosition.transialtion.x,gameObject.handPosition.transialtion.y);
+                gameObject.setAngle(gameObject.handPosition.angle);
+            }
+        });
+       this.input.on('drop',  (pointer: any, gameObject: KevinOnline.Objects.DragableCard, dropZone: KevinOnline.Objects.DropZone)=>{
+           if(gameObject instanceof dragableCard){
+            if(gameObject.cardData.placement_settings.mana_cost <= this.gameState.selfProxy.mana && 
+                !dropZone.getData("active") && 
+                (dropZone.getData("owner") === gameObject.cardData.placement_settings.owner || gameObject.cardData.placement_settings.owner === "self_and_opponent")){
+                  this.gameState.selfProxy.mana -= gameObject.cardData.placement_settings.mana_cost;
+                  this.newCard(dropZone.getData("owner") as KevinOnline.Owner,dropZone,gameObject.cardData.index)
+                  this.player_hand.removeCard(gameObject);
+              }
+           }
+        });
+    
     }
     /**
      * Creates a new card at a given dropzone

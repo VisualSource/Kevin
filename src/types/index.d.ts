@@ -272,6 +272,7 @@ declare namespace KevinOnline{
     interface Settings{
         uuid: string;
         online: boolean;
+        debug: boolean;
     }
     interface QueryableWorker{
         private workerInstance: Worker;

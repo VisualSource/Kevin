@@ -261,6 +261,18 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     constructor({scene, posistion,id, graveyard, dropzone_id}: KevinOnline.Params.IBoardCard){
         super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
+        if(this.owner === "self") {
+            this.setInteractive().scene.input.setDraggable(this,true);
+            this.on("dragstart",(gameObject: this, x: number, y: number)=>{
+                
+            });
+            this.on("drag",(gameObject: this, x: number, y: number)=>{
+                
+            });
+            this.on("dragend",(gameObject: this, x: number, y: number)=>{
+                
+            });
+        }
         CreateAblites(this.cardData.abilities,this);
         this.attack = this.cardData.attack.damage;
         this.graveyard = graveyard;
@@ -289,6 +301,7 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
        this.emmiter.on("end_of_turn",(data:any)=>{
            if(data.owner === this.owner)this.emit("end_of_turn");//emit for ablity
        });
+      
     }
     /**
      * Card init. 

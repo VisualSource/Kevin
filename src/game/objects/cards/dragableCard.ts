@@ -42,6 +42,7 @@ export default class dragableCard extends GameObjects.Sprite implements KevinOnl
         
         if(canInteract){
           scene.input.setDraggable(this);
+
           this.on("pointerover",()=> {
             this.view()
           });
