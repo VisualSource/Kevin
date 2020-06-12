@@ -1,4 +1,4 @@
-import {GameObjects} from 'phaser';
+import {GameObjects, Math, Input, Utils} from 'phaser';
 import CardJson,{CardDeckMannager} from '../../utils/Loader';
 import PhaserHealth from 'phaser-component-health';
 import EventDispatcher from '../../utils/EventDispatcher';
@@ -81,22 +81,22 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             switch (data.affecting_player) {
                 case "self":{
                     (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getChildren().forEach((card, i)=>{
-                        (card as BoardCard).damageCard(data.ability_int, i, sprite.owner);
+                        (card as BoardCard).damageCard(data.ability_int, { id: i , owner: sprite.owner});
                     });
                     break;
                 }
                 case "opponent":{
                     (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getChildren().forEach((card, i)=>{
-                        (card as BoardCard).damageCard(data.ability_int, i, sprite.owner);
+                        (card as BoardCard).damageCard(data.ability_int, { id: i , owner: sprite.owner});
                     });
                     break;
                 }
                 case "self_and_opponent":{
                     (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getChildren().forEach((card, i)=>{
-                        (card as BoardCard).damageCard(data.ability_int, i, sprite.owner);
+                        (card as BoardCard).damageCard(data.ability_int, { id: i , owner: sprite.owner});
                     });
                     (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getChildren().forEach((card, i)=>{
-                        (card as BoardCard).damageCard(data.ability_int, i, sprite.owner);
+                        (card as BoardCard).damageCard(data.ability_int, { id: i , owner: sprite.owner});
                     });
                     break;
                 }
@@ -204,20 +204,22 @@ function run(sprite: BoardCard, data: KevinOnline.CardAbilities, event: any){
             switch (data.affecting_player) {
                 case "opponent":{
                     const board = (sprite.GameScene.player_1_board as KevinOnline.Objects.BoardObject);
-                    const poss = board.activeSpots()[0]?.id;
-                    if(poss !== undefined){
-                        const card = (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getCardByDropZone(poss);
+                    const poss = board.activeSpots()[0];
+                    if(poss.id !== undefined){
+                        const card = (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).getCardByDropZone(poss.id);
                         (sprite.GameScene.player_1_board_c as KevinOnline.Objects.CardGroup).removeCard(card);
+                        poss.setData("active",false);
                         sprite.GameScene.spawnCard(sprite.GameScene.ownerInvert(card.owner),card.cardData.index,0);
                     }
                     break;
                 }
                 case "self":{
                     const board = (sprite.GameScene.player_2_board as KevinOnline.Objects.BoardObject);
-                    const poss = board.activeSpots()[0]?.id;
-                    if(poss !== undefined){
-                        const card = (sprite.GameScene.player_2_board_c as KevinOnline.Objects.CardGroup).getCardByDropZone(poss);
+                    const poss = board.activeSpots()[0];
+                    if(poss.id !== undefined){
+                        const card = (sprite.GameScene.player_2_board_c as KevinOnline.Objects.CardGroup).getCardByDropZone(poss.id);
                         (sprite.GameScene.player_2_board_c as KevinOnline.Objects.CardGroup).removeCard(card);
+                        poss.setData("active",false);
                         sprite.GameScene.spawnCard(sprite.GameScene.ownerInvert(card.owner),card.cardData.index,0);
                     }
                     break;
@@ -258,19 +260,49 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     attack: number;
     actionPoints: number = 1;
     graveyard: KevinOnline.IPosistion;
+    statusEffects: any[] = [];
     constructor({scene, posistion,id, graveyard, dropzone_id}: KevinOnline.Params.IBoardCard){
         super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
         if(this.owner === "self") {
+            let rope: GameObjects.Rope | null = null;
+            let targetObject = { id: -1, owner: null};
             this.setInteractive().scene.input.setDraggable(this,true);
-            this.on("dragstart",(gameObject: this, x: number, y: number)=>{
-                
+            this.on("dragstart",(pointer: Input.Pointer, x: number, y: number)=>{
+                const start = this.getCenter();
+                rope = this.scene.add.rope(start.x,start.y,"",undefined,[new Math.Vector2(x,y)]);
             });
-            this.on("drag",(gameObject: this, x: number, y: number)=>{
-                
+            this.on("drag",(pointer: Input.Pointer)=>{
+               Utils.Array.Replace(rope?.points as any,rope?.points[1],new Math.Vector2(pointer.x - this.x,pointer.y - this.y));
+               rope?.setDirty();
             });
-            this.on("dragend",(gameObject: this, x: number, y: number)=>{
-                
+            this.on("dragend",()=>{
+                if(targetObject.id !== -1) this.emmiter.emit("attacking", { 
+                    target_owner: targetObject.owner, 
+                    target_id: targetObject.id,
+                    damage: this.attack, 
+                    type: this.cardData.attack.damage_type, 
+                    status_length: this.cardData.attack.status_length,
+                    from: {
+                        id: this.getData("dropzone_id"),
+                        owner: this.owner
+                    }
+                });
+                rope?.destroy(true);
+            });
+            this.on("dragover",(pointer: Input.Pointer, target: KevinOnline.Objects.DropZone)=>{
+                   if(targetObject.id === target.id) return;
+                   if(target.getData("active") && this.owner !== target.getData("owner")) {
+                       const {can_attack_cards, can_attack_player} = this.cardData.attack;
+                       if(can_attack_cards && can_attack_player){
+                            targetObject = { id: target.id, owner: target.getData("owner")};
+                       }else if(can_attack_cards && (target.id >= 0 && target.id <= 5)){ // check if it is a card zone
+                        targetObject = { id: target.id, owner: target.getData("owner")};
+                       }else if(can_attack_player && target.id === 6){
+                           targetObject = { id: target.id, owner: target.getData("owner")};
+                       }
+                   } else targetObject = { id: -4 , owner: null};
+                   
             });
         }
         CreateAblites(this.cardData.abilities,this);
@@ -296,11 +328,25 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
                     }
                 }
 
+                this.statusEffects.forEach(value=>{
+                        value();
+                });
+
             }
         });
-       this.emmiter.on("end_of_turn",(data:any)=>{
-           if(data.owner === this.owner)this.emit("end_of_turn");//emit for ablity
-       });
+        this.emmiter.on("end_of_turn",(data:any)=>{
+            if(data.owner === this.owner)this.emit("end_of_turn");//emit for ablity
+        });
+        this.emmiter.on("attacking",(data: KevinOnline.Events.Attacking)=>{
+           if(data.target_id === this.getData("dropzone_id") && this.owner === data.target_owner){
+                  this.damageCard(data.damage,data.from);
+                  if(data.type === "poison"){
+                      this.statusEffects.push(()=>{
+                          console.log("Status Effect");
+                      });
+                  }
+           }
+        });
       
     }
     /**
@@ -327,9 +373,9 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
      * @param {KevinOnline.Owner} owner
      * @memberof BoardCard
      */
-    damageCard(damage: number, index:number, owner: KevinOnline.Owner){
+    damageCard(damage: number, from: KevinOnline.Events.Attacking["from"]){
         this.damage(damage);
-        this.emit("takes_damage", {index, owner});//emit for ablity
+        this.emit("takes_damage", from);//emit for ablity
     }
     /**
      * Allow access to the game scene from out side sprite

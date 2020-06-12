@@ -3,7 +3,7 @@ declare namespace KevinOnline{
     type CardClass = "Warrior" | "Mage" | "Spy" | "Obelisk";
     type CardType = "Creature" | "Hero" | "Spell" | "Trap" | "Aura" | "Booster";
     type CardRarity = "Common" | "Un-common" | "Rare" | "Ultra-Rare" | "Legendary";
-    type CardDamageType = "Basic" | "Poison" | "stun";
+    type CardDamageType = "basic" | "poison" | "stun";
     namespace Params{
         interface BaseParams{ scene: Phaser.Scene;}
         interface ICardGroup extends BaseParams{}
@@ -212,6 +212,19 @@ declare namespace KevinOnline{
             spawn({card_id, zone_id, amount = 1}:{card_id: number,zone_id:number,amount:number}): this
         }
     }
+    namespace Events{
+        interface Attacking{
+            target_owner: Owner;
+            target_id: number;
+            damage: number;
+            type: CardDamageType;
+            status_length: number;
+            from: {
+                id: number;
+                owner: Owner;
+            }
+        }
+    }
     interface IPosistion {
         x: number;
         y: number;
@@ -241,6 +254,7 @@ declare namespace KevinOnline{
             can_attack_player: boolean;
             can_attack_cards: boolean;
             damage_type: CardDamageType;
+            status_length: number;
             attack_particle: string;
             sound_cue_attack: string;
         },
@@ -269,6 +283,7 @@ declare namespace KevinOnline{
             }
         }
     }
+
     interface Settings{
         uuid: string;
         online: boolean;

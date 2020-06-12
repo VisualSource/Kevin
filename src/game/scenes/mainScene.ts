@@ -11,7 +11,7 @@ import QueryableWorker from '../state/OpponentHander';
 
 import PhaserGUIAction from 'phaser3_gui_inspector';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
-    settings: KevinOnline.Settings = { uuid: "", online: false, debug: true}
+    settings: KevinOnline.Settings = { uuid: "", online: false, debug: false}
     gameState = GameState.getInstance();
     cardManager = CardDeckMannager.getInstance();
     worker = QueryableWorker.getInstance();
@@ -99,6 +99,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         });
         this.player_2_board_c = new CardGroup({scene: this});
         this.player_2_board_c.addCard(this.player_2_board.getSlot(0),1);
+        this.player_2_board_c.addCard(this.player_2_board.getSlot(5),1);
         this.input.on('drag', function (pointer: any, gameObject: KevinOnline.Objects.DragableCard) {
             if(gameObject instanceof dragableCard){
                 gameObject.setAngle(0);

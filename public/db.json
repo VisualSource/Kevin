@@ -20,11 +20,12 @@
                 "back_texture":"default"
             },
             "attack":{
-                "damage": 0,
+                "damage": 2,
                 "mana_cost":0,
-                "can_attack_player": false,
-                "can_attack_cards": false,
+                "can_attack_player": true,
+                "can_attack_cards": true,
                 "damage_type":"basic",
+                "status_length": 0,
                 "attack_particle":"",
                 "sound_cue_attack":""
             },
@@ -75,11 +76,12 @@
                 "back_texture":"default"
             },
             "attack":{
-                "damage": 0,
+                "damage": 2,
                 "mana_cost":0,
-                "can_attack_player": false,
-                "can_attack_cards": false,
+                "can_attack_player": true,
+                "can_attack_cards": true,
                 "damage_type":"basic",
+                "status_length": 0,
                 "attack_particle":"",
                 "sound_cue_attack":""
             },
