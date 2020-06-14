@@ -1,4 +1,4 @@
-import React,{useEffect, useState, useReducer, useCallback} from 'react';
+import React,{useEffect, useState, useReducer, useCallback, createRef, forwardRef} from 'react';
 import useForceUpdate from 'use-force-update';
 import Sidenav from '../Sidenav';
 import {Button, Select, Image, Input, Message, Spin, Modal, Card} from 'shineout';
@@ -8,6 +8,7 @@ import QueryableWorker from '../../game/state/OpponentHander';
 import {CardDeckMannager} from "../../game/utils/Loader";
 import {useAuth0} from '../AuthProvidor';
 import { Route, useParams} from "react-router-dom";
+import { create } from 'domain';
 const cdMannager = CardDeckMannager.getInstance();
 export default function Play(){
     document.title = "Kevin Online - Play";
@@ -107,6 +108,7 @@ function PlayGame(props:any){
                 routeTo("/play",{replace: true});
             });
             forceUpdate();
+            
         }
         if(!loading){
             if(isAuthenticated && type === "multiplayer"){
@@ -136,9 +138,11 @@ function PlayGame(props:any){
 
      return <div id="playing">
                 <nav id="play-nav">
-                    <Select onChange={(value)=>{
+                    <Select noCache={true} onChange={(value)=>{
                         cdMannager.setDeck("deck_"+value);
-                    }} renderItem={c => `${Utils.String.UppercaseFirst(c)} Deck`} renderResult={c => `${Utils.String.UppercaseFirst(c)} Deck`} style={{width: 240}} data={decks} keygen={(value: string)=>value} placeholder="Select your deck"/>
+                        return value;
+                        //@ts-ignore
+                    }} renderItem={c => `${Utils.String.UppercaseFirst(c)} Deck`} onCreate={e=>e} loading={false} style={{width: 240}} data={decks} keygen={(value: string)=>value} placeholder="Select your deck"/>
                 </nav>
                 <div>
                     <div id="left"></div>
@@ -147,9 +151,9 @@ function PlayGame(props:any){
                         <Image shape="circle" width={150} height={150} title="user_logo" src={opponentData.logo}/>
                         <h4>{opponentData.name}</h4>
                         <p>Status: {opponentData.status}</p>
-                        {mode === "singleplayer" ?  <Select onChange={(value)=>{
+                        {mode === "singleplayer" ?  <Select onCreate={e=>e} onChange={(value)=>{
                             worker?.send("ai_difficlty",{value});
-                        }} keygen={(value: any)=>value} data={["Easy","Normal","Hard"]} defaultValue={[1]} style={{width: 120}} placeholder="Set Difficlty"/> :<Button type="danger" onClick={()=>{
+                        }} keygen={(value: any)=>value} data={["Easy","Normal","Hard"]} defaultValue={[1]} style={{width: 120}} value={"Normal"}/> :<Button type="danger" onClick={()=>{
                             dispatchOpponent({type:"user", value:{status:"Wating", name:"Wating for User", logo:"no_user"}});
                             worker?.send("kick",{}); }
                             }>Kick</Button>}
@@ -175,7 +179,7 @@ function PlayGame(props:any){
                     </div>
                     <div id="center">
                         <h1>Join Code</h1>
-                        <Input style={{width: 240}}  placeholder="d853c4929da544aea121" disabled defaultValue={code} value={code}/>
+                                <Input style={{width: 240}}  placeholder="d853c4929da544aea121" disabled defaultValue={code} value={code}/>
                        {host ?  <Button loading={canStart()} type="primary" onClick={()=>{
                             worker?.send("game_start",{});
                             routeTo("/game",{query:{uuid: code, online: false}, replace: true});

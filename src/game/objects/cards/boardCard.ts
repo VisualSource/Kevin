@@ -270,7 +270,7 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
             this.setInteractive().scene.input.setDraggable(this,true);
             this.on("dragstart",(pointer: Input.Pointer, x: number, y: number)=>{
                 const start = this.getCenter();
-                rope = this.scene.add.rope(start.x,start.y,"",undefined,[new Math.Vector2(x,y)]);
+                rope = this.scene.add.rope(start.x,start.y,"shader_stripes",undefined,[new Math.Vector2(x,y)]);
             });
             this.on("drag",(pointer: Input.Pointer)=>{
                Utils.Array.Replace(rope?.points as any,rope?.points[1],new Math.Vector2(pointer.x - this.x,pointer.y - this.y));

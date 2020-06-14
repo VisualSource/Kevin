@@ -37,6 +37,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.gameState.OverlayProxy.show = true;
     }
     create(){
+        const shader = this.add.shader("Stripes",0,0,50,50).setRenderToTexture("shader_stripes");
         this.graveyard_a = new Graveyard(this,{
             x: 300 + 1400,
             y: 600

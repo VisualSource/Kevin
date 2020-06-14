@@ -93,10 +93,10 @@
             },
             "abilities":[
                 {
-                    "type":"swap_cards_in_hand",
+                    "type":"retaliation_damage",
                     "ability_int": 1,
-                    "trigger": "on_drop",
-                    "after_use_state":"single_use_send_to_graveyard_after_ability",
+                    "trigger": "takes_damage",
+                    "after_use_state":"remain_in_play",
                     "affecting_player":"self",
                     "partice":"",
                     "sound_cue":""

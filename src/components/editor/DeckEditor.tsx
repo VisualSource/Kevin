@@ -1,5 +1,5 @@
 import React,{useState, useEffect, createRef} from 'react';
-import {Button, Select, Input, Card, Tag, Modal} from 'shineout';
+import {Button, Select, Input, Card, Tag, Modal, Rule} from 'shineout';
 import {init, event} from './viewer';
 
 import CardJson from '../../game/utils/Loader';
@@ -9,6 +9,7 @@ interface IDeck{
     id: number;
     amount: number;
 }
+const decknameRule = Rule();
 export default function DeckEditor(){
     const cv = createRef<HTMLCanvasElement>();
     const [modal, setModel] = useState(false);
@@ -39,8 +40,8 @@ export default function DeckEditor(){
     },[]);
     return <div id="editor">
             <Modal title="You have a unsaved deck!" visible={modal} onClose={()=>setModel(false)} footer={
-                [<Button onClick={()=>exit()}>Save and Exit</Button>,
-                <Button onClick={()=>exit()}>Exit</Button>]}>
+                [<Button key={1} onClick={()=>exit()}>Save and Exit</Button>,
+                <Button key={2} onClick={()=>exit()}>Exit</Button>]}>
                     Do you want to save the changes?
                 </Modal>
             <div id="card-viewer"> 
@@ -67,7 +68,7 @@ export default function DeckEditor(){
             <div id="card-selection">
                 <section id="finder">
                     <nav>
-                        <Select onCreate={(text)=>text} keygen={(data: any)=>`${data}${Math.random().toPrecision(3)}`} data={["Common","Un-common","Rare","Spell","Trap"]} placeholder="Search" multiple onFilter={text => d => d.indexOf(text) >= 0} filterDelay={0}/>
+                        <Select onCreate={(text: string)=>text} keygen={(data: any)=>`${data}${Math.random().toPrecision(3)}`} data={["Common","Un-common","Rare","Spell","Trap"]} placeholder="Search" multiple onFilter={(text: string) => (d: any[]) => d.indexOf(text) >= 0} filterDelay={0}/>
                         <Button type="primary">Search</Button>
                     </nav>
                     <section>
@@ -118,7 +119,7 @@ export default function DeckEditor(){
                     </section>
                 </section>
                 <div id="deck">
-                        <Input size="small" placeholder="Deck Name" onChange={(value)=>{setDeckName(value)}}/>
+                         <Input size="small" placeholder="Deck Name" type="text" rules={[decknameRule.required, decknameRule.min(4)]} onChange={(value: string)=>{setDeckName(value)}}/>
                         <section>
                             {
                                 deck.map(card=>{

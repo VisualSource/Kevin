@@ -64,6 +64,7 @@ export default class LoadingScene extends Scene{
         this.cardManager.fetchOpponentDeck();
         assetText.setText('Loading Your Deck');
         this.cardManager.loadDeck();
+        this.load.glsl("shader","assets/shader.frag");
         CardJson.getInstance().resources?.assets.forEach(asset=>{
             this.load.image(asset.name,asset.texture);
         }); 
