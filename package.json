@@ -40,7 +40,7 @@
   "devDependencies": {
     "@rescripts/cli": "0.0.14",
     "@rescripts/rescript-use-babel-config": "0.0.10",
-    "@testing-library/jest-dom": "^5.9.0",
+    "@testing-library/jest-dom": "^5.10.1",
     "@testing-library/react": "^10.2.1",
     "@testing-library/user-event": "^11.4.0",
     "@types/node": "^14.0.13",
