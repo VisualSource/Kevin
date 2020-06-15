@@ -266,15 +266,18 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
         if(this.owner === "self") {
             let rope: GameObjects.Rope | null = null;
+            let targetSprite: GameObjects.Sprite | null = null;
             let targetObject = { id: -1, owner: null};
             this.setInteractive().scene.input.setDraggable(this,true);
             this.on("dragstart",(pointer: Input.Pointer, x: number, y: number)=>{
                 const start = this.getCenter();
-                rope = this.scene.add.rope(start.x,start.y,"shader_stripes",undefined,[new Math.Vector2(x,y)]);
+                rope = this.scene.add.rope(start.x,start.y,"shader_stripes",undefined,[new Math.Vector2(x,y)]).setDepth(2);
+                targetSprite = this.scene.add.sprite(0,0,"").setVisible(false).setSize(100,100).setDepth(1);
             });
             this.on("drag",(pointer: Input.Pointer)=>{
                Utils.Array.Replace(rope?.points as any,rope?.points[1],new Math.Vector2(pointer.x - this.x,pointer.y - this.y));
                rope?.setDirty();
+               if(targetSprite?.visible) targetSprite?.setPosition(pointer.x,pointer.y);
             });
             this.on("dragend",()=>{
                 if(targetObject.id !== -1) this.emmiter.emit("attacking", { 
@@ -289,6 +292,7 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
                     }
                 });
                 rope?.destroy(true);
+                targetSprite?.destroy(true);
             });
             this.on("dragover",(pointer: Input.Pointer, target: KevinOnline.Objects.DropZone)=>{
                    if(targetObject.id === target.id) return;
@@ -304,6 +308,17 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
                    } else targetObject = { id: -4 , owner: null};
                    
             });
+            this.on("dragenter",()=>{
+                if(!targetSprite?.visible){
+                    targetSprite?.setVisible(true);
+                }
+               
+            });
+            this.on("dragleave",()=>{
+                if(targetSprite?.visible){
+                    targetSprite?.setVisible(false);
+                }
+            })
         }
         CreateAblites(this.cardData.abilities,this);
         this.attack = this.cardData.attack.damage;
