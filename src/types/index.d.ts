@@ -27,6 +27,7 @@ declare namespace KevinOnline{
             posistion: IPosistion;
             graveyard: IPosistion;
             dropzone_id: number;
+            owner?: Owner;
         }
         interface IBoard extends BaseParams{
             owner: Owner;

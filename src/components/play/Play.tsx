@@ -8,14 +8,13 @@ import QueryableWorker from '../../game/state/OpponentHander';
 import {CardDeckMannager} from "../../game/utils/Loader";
 import {useAuth0} from '../AuthProvidor';
 import { Route, useParams} from "react-router-dom";
-import { create } from 'domain';
 const cdMannager = CardDeckMannager.getInstance();
 export default function Play(){
     document.title = "Kevin Online - Play";
     return <div id="play">
         <main>
             <Route path="/play/:type">
-                        <PlayGame host={true}/>
+                        <PlayGame host={false}/>
             </Route>
             <Route exact path="/play">
                 <PlayHome/>
@@ -81,11 +80,21 @@ function PlayGame(props:any){
             setMode(online);
             setDecks(cdMannager.getDecks());
             setIsLoading(false);
+            const query = queryFromURI();
             worker = QueryableWorker.create(type);
-            worker.send("join_code",{ join: queryFromURI()});
-            worker.send("init",{ name: userData.name, status: userData.status.status, logo: userData.logo});
+            
+            worker.addListeners("websocket_ready",(event: any)=>{
+                if(query?.create === "TRUE"){ 
+                    setHost(true);
+                    worker?.send("new_game",{});
+                };
+                if(query?.uuid) worker?.send("join_game",{ uuid: query?.uuid});
+                
+            });
             worker.addListeners("init",(event: any)=>{
-                dispatchOpponent({type:"user", value: {name: event.name, status: event.status, logo: event.logo}});
+                console.log("init",event);
+                
+               dispatchOpponent({type:"user", value: {name: event.name, status: event.status, logo: event.logo}});
                 forceUpdate();
             });
             worker.addListeners("status_opponent",(event: any)=>{
@@ -95,6 +104,7 @@ function PlayGame(props:any){
             });
             worker.addListeners("join_code",(event: any)=>{
                 setCode(event.uuid);
+                worker?.send("init",{ name: userData.name, status: userData.status.status, logo: userData.logo});
             });
             worker.addListeners("game_start",(event: any)=>{
                 routeTo("/game",{query:{uuid: code, online: true}, replace: true});
@@ -194,7 +204,7 @@ function PlayHome(){
     const [code, setCode] = useState();
     const Footer = ()=>{
         return <div>
-            <Button onClick={()=>routeTo("/play/multiplayer",{})}>Start a Game</Button>
+            <Button onClick={()=>routeTo("/play/multiplayer",{ query: {create: "TRUE"}})}>Start a Game</Button>
             <Button onClick={()=>{
                 if(code){
                     routeTo("/play/multiplayer",{query:{uuid:code}})

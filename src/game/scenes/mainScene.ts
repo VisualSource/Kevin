@@ -8,7 +8,7 @@ import GameState from '../state/GameState';
 import {CardDeckMannager} from '../utils/Loader';
 import QueryableWorker from '../state/OpponentHander';
 
-
+import SceneWatcherPlugin from 'phaser-plugin-scene-watcher'
 import PhaserGUIAction from 'phaser3_gui_inspector';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
     settings: KevinOnline.Settings = { uuid: "", online: false, debug: false}
@@ -30,6 +30,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.settings.uuid = data.settings.uuid;
         this.settings.online = data.settings.online as any === "true" ? true : false;
         if(this.settings.debug){
+            this.plugins.install("SceneWatcher",SceneWatcherPlugin, true);
             PhaserGUIAction(this);
         }
     }
@@ -37,7 +38,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         this.gameState.OverlayProxy.show = true;
     }
     create(){
-        const shader = this.add.shader("Stripes",0,0,50,50).setRenderToTexture("shader_stripes");
+        this.add.shader("Stripes",0,0,50,50).setRenderToTexture("shader_stripes");
         this.graveyard_a = new Graveyard(this,{
             x: 300 + 1400,
             y: 600

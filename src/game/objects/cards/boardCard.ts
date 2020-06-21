@@ -256,13 +256,14 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     cardData: KevinOnline.CardData;
     emmiter: EventDispatcher;
     lifeSpan: number = 0;
-    owner: KevinOnline.Owner = "self";
+    owner: KevinOnline.Owner;
     attack: number;
     actionPoints: number = 1;
     graveyard: KevinOnline.IPosistion;
     statusEffects: any[] = [];
-    constructor({scene, posistion,id, graveyard, dropzone_id}: KevinOnline.Params.IBoardCard){
+    constructor({scene, posistion,id, graveyard, dropzone_id, owner}: KevinOnline.Params.IBoardCard){
         super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
+        this.owner = owner ?? "self";
         this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
         if(this.owner === "self") {
             let rope: GameObjects.Rope | null = null;
