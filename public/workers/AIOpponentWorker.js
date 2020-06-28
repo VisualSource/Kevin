@@ -1,9 +1,9 @@
 importScripts("./core.js", "./yuka.min.js");
-var Events = Core.Events, EventHandler = Core.EventHandler, reply = Core.reply;
-var eventHandler = new EventHandler();
-self.onmessage = function (event) { return eventHandler.emit(event.data.name, event.data.data); };
-var deck = [{ id: 0, ammount: 3 }];
-var ai_config = {
+const { Events, EventHandler, reply } = Core;
+const eventHandler = new EventHandler();
+self.onmessage = event => eventHandler.emit(event.data.name, event.data.data);
+const deck = [{ id: 0, ammount: 3 }];
+const ai_config = {
     uuid: YUKA.MathUtils.generateUUID(),
     health: 30,
     difficlty: "Normal",
@@ -13,32 +13,33 @@ var ai_config = {
     type: "YUKA"
 };
 reply(Events.WEBSOCKET_READY, { system: ai_config.type });
-eventHandler.addListener(Events.REQUEST_DECK, function () {
-    reply(Events.REQUEST_DECK, { deck: deck, id: ai_config.uuid });
+reply(Events.INIT, { logo: ai_config.logo, name: ai_config.name, status: ai_config.status });
+eventHandler.addListener(Events.REQUEST_DECK, () => {
+    reply(Events.REQUEST_DECK, { deck, id: ai_config.uuid });
 });
-eventHandler.addListener(Events.READY, function (event) {
+eventHandler.addListener(Events.READY, (event) => {
 });
-eventHandler.addListener(Events.TURN_CHANGE, function (event) {
+eventHandler.addListener(Events.TURN_CHANGE, (event) => {
     console.log("Turn Change", event);
-    setTimeout(function () {
+    setTimeout(() => {
         reply(Events.TURN_CHANGE, {});
     }, 1000);
 });
-eventHandler.addListener(Events.GAME_START, function () { });
-eventHandler.addListener(Events.KICK, function () {
+eventHandler.addListener(Events.GAME_START, () => { });
+eventHandler.addListener(Events.KICK, () => {
     reply(Events.KICK, {});
 });
-eventHandler.addListener(Events.JOIN_CODE, function (event) {
+eventHandler.addListener(Events.JOIN_CODE, (event) => {
     console.log(event);
     reply(Events.JOIN_CODE, { uuid: YUKA.MathUtils.generateUUID() });
 });
-eventHandler.addListener(Events.AI_DIFFICLTY, function (event) {
+eventHandler.addListener(Events.AI_DIFFICLTY, (event) => {
     ai_config.difficlty = event;
     console.log("Event: ai_difficlty, Set Ai difficlty to: ", event);
 });
-eventHandler.addListener(Events.INIT, function (event) {
+eventHandler.addListener(Events.INIT, (event) => {
     reply(Events.INIT, { name: ai_config.name, status: ai_config.status, logo: ai_config.logo });
 });
-eventHandler.addListener(Events.STATUS_OPPONENT, function (event) {
+eventHandler.addListener(Events.STATUS_OPPONENT, (event) => {
     console.log("Event: status_opponent", event);
 });

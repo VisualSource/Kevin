@@ -375,13 +375,13 @@ canvas
     transform: scale(1)
     filter: hue-rotate(0deg)
   
-
-
 .card 
   background-color: #43425D
   animation: cardEntrance 700ms ease-out
   animation-fill-mode: backwards
   user-select: none
+  &:hover 
+      transform: scale(1.1)
 .card:nth-child(1) 
         grid-area: a
         animation-delay: calc(1 * var(--stagger-delay))

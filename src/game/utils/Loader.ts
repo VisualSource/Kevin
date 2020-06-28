@@ -1,5 +1,5 @@
 
-import OpponentHander from '../state/OpponentHander';
+import QueryableWorker from '../state/OpponentHander';
 import {RandomNumber} from '../utils/Math';
 interface data{
     version: string;
@@ -51,29 +51,40 @@ let instance: CardDeckMannager | null = null;
 export class CardDeckMannager{
     userDeck: { id: number, ammount : number}[] = [];
     opponentDeck: { id: number, ammount : number}[] = [];
+    selected_deck: string = "default";
     static getInstance(): CardDeckMannager{
         if(instance == null){
           instance = new CardDeckMannager();
         }
         return instance;
       }
-      fetchOpponentDeck(){
-          const handler = OpponentHander.getInstance();
-          if(handler !== null){
-            handler.send("request_deck",{});
-            handler.addListeners("request_deck",(data: any)=>{
-              this.opponentDeck = data.deck;
-            });
-          }
+    init(){
+      const worker = QueryableWorker.getInstance();
+      worker.addListeners("send_deck",()=>{
+        worker.send("send_deck", { deck: this.userDeck});
+      });
+    }
+     async fetchOpponentDeck(){
+       const worker = QueryableWorker.getInstance();
+          if(worker !== null) worker.send("request_deck",{});
+          const data = await new Promise<{ id: number, ammount : number}[]>( (resolutionFunc,rejectionFunc) =>{
+                worker?.addListeners("request_deck",(data: any)=>{
+                  this.opponentDeck = data.deck;
+                  resolutionFunc(data.deck);
+                });
+            
+          });
+        return await data;
       }
       get deckSet(){
         return this.userDeck.length > 0 ? true : false;
       }
       setDeck(id: string){
-        const data = window.localStorage.getItem(id);
+        const data = window.localStorage.getItem(`deck_${id}`);
         if(data !== null){
           this.userDeck = JSON.parse(data);
         }
+        this.selected_deck = id;
         
       }
       getDecks(): string[]{
@@ -84,11 +95,13 @@ export class CardDeckMannager{
         }
         return decks;
       }
-      loadDeck(id: string = "default"){
+      loadDeck(){
         try {
-            this.userDeck = JSON.parse(window.localStorage.getItem(`deck_${id}`) as string);
+            this.userDeck = JSON.parse(window.localStorage.getItem(`deck_${this.selected_deck}`) as string);
+            return this.userDeck;
         } catch (error) {
             console.log(error);
+            return null;
         }
       }
       saveDeck(id: string = "default", deck: any[]){

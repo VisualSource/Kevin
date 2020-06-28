@@ -1,16 +1,18 @@
 import {Scene} from 'phaser';
 import CardJson from '../utils/Loader';
 import {CardDeckMannager} from '../utils/Loader';
+import QueryableWorker from '../../game/state/OpponentHander';
 export default class LoadingScene extends Scene{
     cardManager = CardDeckMannager.getInstance();
     constructor(){
         super("loading");
     }
     preload(){	
+        this.cardManager.loadDeck();
         const width = this.game.config.width as number;
         const height = this.game.config.height as number;
         const progressBar = this.add.graphics();
-        const progressBox = this.add.graphics();
+        const progressBox = this.add.graphics().fillStyle(0x222222, 0.8).fillRect((width/3) + 150, (height/2) + 100, 320, 50)
         const loadingText = this.make.text({
             x: width / 2,
             y: height / 2 + 80,
@@ -19,7 +21,7 @@ export default class LoadingScene extends Scene{
                 font: '20px',
                 fill: '#ffffff'
             }
-        });
+        }).setOrigin(0.5, 0.5)
         const percentText = this.make.text({
             x: width / 2,
             y: height / 2 + 125,
@@ -28,7 +30,7 @@ export default class LoadingScene extends Scene{
                 font: '18px',
                 fill: '#ffffff'
             }
-        });	
+        }).setOrigin(0.5, 0.5)
         const assetText = this.make.text({
             x: width / 2,
             y: height / 2 + 160,
@@ -37,12 +39,7 @@ export default class LoadingScene extends Scene{
                 font: '18px',
                 fill: '#ffffff'
             }
-        });
-        assetText.setOrigin(0.5, 0.5);
-        percentText.setOrigin(0.5, 0.5);
-        loadingText.setOrigin(0.5, 0.5);
-        progressBox.fillStyle(0x222222, 0.8);
-        progressBox.fillRect((width/3) + 150, (height/2) + 100, 320, 50);
+        }).setOrigin(0.5, 0.5)
         this.load.image("logo","/assets/logo_transparent.png");
         this.load.on("progress",(value: any)=>{
             progressBar.clear();
@@ -60,10 +57,6 @@ export default class LoadingScene extends Scene{
             percentText.destroy();
             assetText.destroy();
         });
-        assetText.setText('Loading OppoentDeck');
-        this.cardManager.fetchOpponentDeck();
-        assetText.setText('Loading Your Deck');
-        this.cardManager.loadDeck();
         this.load.glsl("shader","assets/shader.frag");
         CardJson.getInstance().resources?.assets.forEach(asset=>{
             this.load.image(asset.name,asset.texture);
@@ -71,8 +64,12 @@ export default class LoadingScene extends Scene{
     }
     create(){
         this.add.image(window.innerWidth/2,window.innerHeight/2, "logo").setScale(0.5).setOrigin(0.5);
-        setTimeout(()=>{
+        this.cardManager.fetchOpponentDeck().then(()=>{
             this.scene.start("main");
-         },500);
+            QueryableWorker.getInstance().send("ready",{});
+        });
     }
+
+    
+
 }

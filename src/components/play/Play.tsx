@@ -82,7 +82,7 @@ function PlayGame(props:any){
             setIsLoading(false);
             const query = queryFromURI();
             worker = QueryableWorker.create(type);
-            
+            cdMannager.init();
             worker.addListeners("websocket_ready",(event: any)=>{
                 if(query?.create === "TRUE"){ 
                     setHost(true);
@@ -110,11 +110,13 @@ function PlayGame(props:any){
                 routeTo("/game",{query:{uuid: code, online: true}, replace: true});
             });
             worker.addListeners("kick",(event: any)=>{
+                worker?.terminate();
                 //@ts-ignore
                 Message.info('You Where kicked',5,{
                     position: "bottom-right",
                     title: "Kicked"
                 });
+                
                 routeTo("/play",{replace: true});
             });
             forceUpdate();
@@ -149,7 +151,7 @@ function PlayGame(props:any){
      return <div id="playing">
                 <nav id="play-nav">
                     <Select noCache={true} onChange={(value)=>{
-                        cdMannager.setDeck("deck_"+value);
+                        cdMannager.setDeck(value);
                         return value;
                         //@ts-ignore
                     }} renderItem={c => `${Utils.String.UppercaseFirst(c)} Deck`} onCreate={e=>e} loading={false} style={{width: 240}} data={decks} keygen={(value: string)=>value} placeholder="Select your deck"/>
@@ -190,10 +192,18 @@ function PlayGame(props:any){
                     <div id="center">
                         <h1>Join Code</h1>
                                 <Input style={{width: 240}}  placeholder="d853c4929da544aea121" disabled defaultValue={code} value={code}/>
-                       {host ?  <Button loading={canStart()} type="primary" onClick={()=>{
-                            worker?.send("game_start",{});
-                            routeTo("/game",{query:{uuid: code, online: false}, replace: true});
-                       }}>Start</Button>: null}
+                       {
+                       host ?  
+                        <Button 
+                            loading={canStart()} 
+                            type="primary" 
+                            onClick={()=>{ 
+                                worker?.send("game_start",{});
+                                routeTo("/game",{query:{uuid: code, online: false}, replace: true});
+                            }}
+                        >Start</Button>
+                        : null
+                        }
                     </div>
                 </div>
            </div>;
