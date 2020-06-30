@@ -1,0 +1,129 @@
+{
+    "profile":{
+        "version":"0.2.0-alpha"
+    },
+    "projects":{
+
+    },
+    "for":"client-0.2.0-alpha-r2",
+    "expanions":[],
+    "cards":[
+        {
+            "index":0,
+            "name":"Pyromaniac Kevin",
+            "type":"Trap",
+            "class":"Obelisk",
+            "rarity":"Common",
+            "special": false,
+            "visual":{
+                "front_texture":"pyro_kevin",
+                "back_texture":"default"
+            },
+            "attack":{
+                "damage": 2,
+                "mana_cost":0,
+                "can_attack_player": true,
+                "can_attack_cards": true,
+                "damage_type":"basic",
+                "status_length": 0,
+                "attack_particle":"",
+                "sound_cue_attack":""
+            },
+            "health":{
+                "health": 1,
+                "life_expectancy": 10,
+                "death_particle": "",
+                "sound_cue_death":""
+            },
+            "abilities":[
+                {
+                    "type":"possess_opponents_card",
+                    "ability_int": 1,
+                    "trigger": "on_drop",
+                    "after_use_state":"remain_in_play",
+                    "affecting_player":"self",
+                    "partice":"",
+                    "sound_cue":""
+                }
+            ],
+            "description":"Hand a bit to much fun",
+            "placement_settings":{
+                "owner":"self",
+                "mana_cost": 2,
+                "entry_particle":"",
+                "sound_cue_entry":""
+            },
+            "deck_settings":{
+                "unlocked": true,
+                "add_to_player_deck": true,
+                "max_num_in_deck": 3,
+                "weight": 0,
+                "screen_size":{
+                    "x":200,
+                    "y": 280
+                }
+            }
+        },
+        {
+            "index":1,
+            "name":"I Didn't do it Kevin",
+            "type":"Trap",
+            "class":"Obelisk",
+            "rarity":"Common",
+            "special": false,
+            "visual":{
+                "front_texture":"didnt_kevin",
+                "back_texture":"default"
+            },
+            "attack":{
+                "damage": 2,
+                "mana_cost":0,
+                "can_attack_player": true,
+                "can_attack_cards": true,
+                "damage_type":"basic",
+                "status_length": 0,
+                "attack_particle":"",
+                "sound_cue_attack":""
+            },
+            "health":{
+                "health": 1,
+                "life_expectancy": 2,
+                "death_particle": "",
+                "sound_cue_death":""
+            },
+            "abilities":[
+                {
+                    "type":"retaliation_damage",
+                    "ability_int": 1,
+                    "trigger": "takes_damage",
+                    "after_use_state":"remain_in_play",
+                    "affecting_player":"self",
+                    "partice":"",
+                    "sound_cue":""
+                }
+            ],
+            "description":"Hand a bit to much fun",
+            "placement_settings":{
+                "owner":"self",
+                "mana_cost": 2,
+                "entry_particle":"",
+                "sound_cue_entry":""
+            },
+            "deck_settings":{
+                "unlocked": true,
+                "add_to_player_deck": true,
+                "max_num_in_deck": 3,
+                "weight": 0,
+                "screen_size":{
+                    "x":200,
+                    "y": 280
+                }
+            }
+        }
+    ],
+    "assets":[
+        {"name":"default", "texture":"assets/default_backing.webp"},
+        {"name":"pyro_kevin", "texture":"assets/pyro_kevin.webp"},
+        {"name":"didnt_kevin", "texture":"assets/didnt_kevin.png"}
+    ]
+}

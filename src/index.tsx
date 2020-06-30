@@ -5,6 +5,7 @@ import * as serviceWorker from './serviceWorker';
 import CardJson from './game/utils/Loader';
 import {Auth0Provider} from './components/AuthProvidor';
 import {history} from './utils/history';
+import {JsonLoader} from '@visualsource/vs_api';
 import 'shineout/dist/theme.default.css';
 import './style/index.sass';
 const onRedirectCallback = (appState: any) => {
@@ -14,6 +15,7 @@ const onRedirectCallback = (appState: any) => {
       : window.location.pathname
   );
 };
+JsonLoader.createInst({part:"/VisualSource/Kevin", cache_id: "card-cache"});
 CardJson.getInstance().hotreloadData();
 ReactDOM.render(
   <Auth0Provider 

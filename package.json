@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.10.0",
+    "@visualsource/vs_api": "^1.0.0",
     "phaser": "^3.23.0",
     "phaser-component-health": "^2.0.3",
     "react": "^16.13.1",
