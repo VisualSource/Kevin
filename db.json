@@ -1,12 +1,12 @@
 {
     "profile":{
-        "version":"0.2.0-alpha"
+        "version":"0.2.0-alpha",
+        "for":"client-0.2.0-alpha-r2",
+        "expanions":[]
     },
     "projects":{
 
     },
-    "for":"client-0.2.0-alpha-r2",
-    "expanions":[],
     "cards":[
         {
             "index":0,

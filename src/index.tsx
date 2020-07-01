@@ -15,7 +15,7 @@ const onRedirectCallback = (appState: any) => {
       : window.location.pathname
   );
 };
-JsonLoader.createInst({part:"/VisualSource/Kevin", cache_id: "card-cache"});
+JsonLoader.createInst({part:"VisualSource/Kevin", cache_id: "card-cache"}).fetch();
 CardJson.getInstance().hotreloadData();
 ReactDOM.render(
   <Auth0Provider 
