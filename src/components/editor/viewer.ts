@@ -1,6 +1,6 @@
 import {WEBGL, Game, Scale, Scene} from 'phaser';
+import {JsonLoader} from '@visualsource/vs_api';
 import EventDispatcher from '../../game/utils/EventDispatcher';
-import CardJson from '../../game/utils/Loader';
 export const event = new EventDispatcher();
 class ViewerScene extends Scene{
     card: Phaser.GameObjects.Sprite| null = null;
@@ -19,8 +19,8 @@ class ViewerScene extends Scene{
         });
     }
     preload(){
-        const front = CardJson.getInstance().resources?.assets.find(value=> value.name === this.frontTexture );
-        const back = CardJson.getInstance().resources?.assets.find(value=> value.name === this.backTexture );
+        const front = JsonLoader.getInst().data?.assets.find((value: KevinOnline.CardData)=> value.name === this.frontTexture );
+        const back = JsonLoader.getInst().data?.assets.find((value: KevinOnline.CardData)=> value.name === this.backTexture );
         this.load.image(this.frontTexture,front?.texture ?? "pyro_kevin.webp");
         this.load.image(this.backTexture,back?.texture ?? "default_backing.webp");
     }

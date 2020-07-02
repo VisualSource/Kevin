@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
-import CardJson from './game/utils/Loader';
 import {Auth0Provider} from './components/AuthProvidor';
 import {history} from './utils/history';
 import {JsonLoader} from '@visualsource/vs_api';
@@ -15,8 +14,7 @@ const onRedirectCallback = (appState: any) => {
       : window.location.pathname
   );
 };
-JsonLoader.createInst({part:"VisualSource/Kevin", cache_id: "card-cache"}).fetch();
-CardJson.getInstance().hotreloadData();
+JsonLoader.createInst({part:"VisualSource/Kevin/db", cache_id: "card-cache"}).fetch();
 ReactDOM.render(
   <Auth0Provider 
     domain={"visualsource.auth0.com"}

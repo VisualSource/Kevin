@@ -1,5 +1,5 @@
-import {GameObjects, Scene, Utils} from 'phaser';
-import CardJson from '../utils/Loader';
+import {GameObjects, Scene} from 'phaser';
+import {JsonLoader} from '@visualsource/vs_api';
 export default class Graveyard extends GameObjects.Group{
     cardList: number[] = [];
     graveyard_location: KevinOnline.IPosistion = {x:0,y:0};
@@ -18,7 +18,7 @@ export default class Graveyard extends GameObjects.Group{
      */
     addCard(index: number, dz_id: number, owner: KevinOnline.Owner): this{
         this.getChildren()[0]?.destroy();
-        const data = CardJson.getInstance().resources?.cards[index] as KevinOnline.CardData;
+        const data = JsonLoader.getInst().data?.cards[index] as KevinOnline.CardData;
         const visual = this.scene.add.sprite(this.graveyard_location.x,this.graveyard_location.y,data.visual.front_texture);
         visual.setDisplaySize(data.deck_settings.screen_size.x,data.deck_settings.screen_size.y);
         this.add(visual);

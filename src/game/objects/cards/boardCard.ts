@@ -1,5 +1,6 @@
 import {GameObjects, Math, Input, Utils} from 'phaser';
-import CardJson,{CardDeckMannager} from '../../utils/Loader';
+import {CardDeckMannager} from '../../utils/Loader';
+import {JsonLoader} from '@visualsource/vs_api';
 import PhaserHealth from 'phaser-component-health';
 import EventDispatcher from '../../utils/EventDispatcher';
 import GameState from '../../state/GameState';
@@ -262,9 +263,9 @@ export default class BoardCard extends GameObjects.Sprite implements KevinOnline
     graveyard: KevinOnline.IPosistion;
     statusEffects: any[] = [];
     constructor({scene, posistion,id, graveyard, dropzone_id, owner}: KevinOnline.Params.IBoardCard){
-        super(scene,posistion.x,posistion.y,CardJson.getInstance().resources?.cards[id].visual.front_texture as string);
+        super(scene,posistion.x,posistion.y,JsonLoader.getInst().data?.cards[id].visual.front_texture as string);
         this.owner = owner ?? "self";
-        this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
+        this.cardData = JsonLoader.getInst().data?.cards[id] as KevinOnline.CardData;
         if(this.owner === "self") {
             let rope: GameObjects.Rope | null = null;
             let targetSprite: GameObjects.Sprite | null = null;

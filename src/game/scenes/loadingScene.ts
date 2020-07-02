@@ -1,5 +1,5 @@
 import {Scene} from 'phaser';
-import CardJson from '../utils/Loader';
+import {JsonLoader} from '@visualsource/vs_api';
 import {CardDeckMannager} from '../utils/Loader';
 import QueryableWorker from '../../game/state/OpponentHander';
 export default class LoadingScene extends Scene{
@@ -58,9 +58,11 @@ export default class LoadingScene extends Scene{
             assetText.destroy();
         });
         this.load.glsl("shader","assets/shader.frag");
-        CardJson.getInstance().resources?.assets.forEach(asset=>{
-            this.load.image(asset.name,asset.texture);
-        }); 
+        JsonLoader.getInst().fetch<{ assets: { name: string, texture: string}[]}>().then(data=>{
+            data.assets.forEach(asset=>{
+                this.load.image(asset.name,asset.texture);
+            }); 
+        });
     }
     create(){
         this.add.image(window.innerWidth/2,window.innerHeight/2, "logo").setScale(0.5).setOrigin(0.5);

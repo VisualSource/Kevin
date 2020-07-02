@@ -1,5 +1,5 @@
 import {GameObjects} from 'phaser';
-import CardJson from '../../utils/Loader';
+import {JsonLoader} from '@visualsource/vs_api';
 /**
  * The main object of the the interactible card that is used for placing on the board and is used in the Hand Class
  *
@@ -35,9 +35,9 @@ export default class dragableCard extends GameObjects.Sprite implements KevinOnl
      * @memberof dragableCard
      */
     constructor({scene, id, canInteract = true, hidden = false}: KevinOnline.Params.IDragableCard){
-        super(scene,0,0, !hidden ? (CardJson.getInstance().resources?.cards[id].visual.front_texture as string) : (CardJson.getInstance().resources?.cards[id].visual.back_texture as string));
+        super(scene,0,0, !hidden ? (JsonLoader.getInst().data?.cards[id].visual.front_texture as string) : (JsonLoader.getInst().data?.cards[id].visual.back_texture as string));
         this.setInteractive();
-        this.cardData = CardJson.getInstance().resources?.cards[id] as KevinOnline.CardData;
+        this.cardData = JsonLoader.getInst().data?.cards[id] as KevinOnline.CardData;
         this.setDisplaySize(this.cardData.deck_settings.screen_size.x,this.cardData.deck_settings.screen_size.y);
         
         if(canInteract){

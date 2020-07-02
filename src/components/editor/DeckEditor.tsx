@@ -1,8 +1,7 @@
 import React,{useState, useEffect, createRef} from 'react';
 import {Button, Select, Input, Card, Tag, Modal, Rule} from 'shineout';
+import {JsonLoader} from '@visualsource/vs_api';
 import {init, event} from './viewer';
-
-import CardJson from '../../game/utils/Loader';
 import { routeTo } from '../../utils/history';
 
 interface IDeck{
@@ -32,9 +31,10 @@ export default function DeckEditor(){
     }
     useEffect(()=>{
         document.title = "Kevin Online - Deck Editor";
-        CardJson.getInstance().fetch().then(data=>{
+        JsonLoader.getInst().fetch<{ cards: KevinOnline.CardData[]}>().then(data=>{
             setCards(data.cards);
         });
+       
         calcCount();
         if(cv.current) init(cv.current);
     },[]);
