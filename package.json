@@ -1,6 +1,6 @@
 {
   "name": "kevin_online",
-  "version": "0.5.2-alpha",
+  "version": "0.8.4-alpha",
   "private": true,
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.10.0",

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {routeTo} from '../utils/history';
-
+import {LocalStorage} from '@visualsource/vs_api';
 
 function Tabs(props: {active: boolean,children: any, text: string, route: string}){
     return <div className={props.active ? "active" : ""} onClick={()=>routeTo(props.route,{})}>
@@ -36,6 +36,10 @@ const tabIcons = [
 },
 ];
 export default function Sidenav(props: {activeTab: number}){
+    const [version, setVersion] = useState("");
+    useEffect(()=>{
+        LocalStorage.read<{ version: string, for: string}>("version").then(data=>setVersion(data.for))
+    },[]);
     return <nav id="side-nav">
                 <header>
                     <h5>Kevin Online</h5>
@@ -52,5 +56,8 @@ export default function Sidenav(props: {activeTab: number}){
                     </Tabs>
                     })
                 }
+                <footer>
+                    <p>{`Version: ${version}`}</p>
+                </footer>
            </nav>
 }

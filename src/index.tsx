@@ -14,7 +14,8 @@ const onRedirectCallback = (appState: any) => {
       : window.location.pathname
   );
 };
-JsonLoader.createInst({part:"VisualSource/Kevin/db", cache_id: "card-cache"}).fetch();
+JsonLoader.createInst({url:"http://localhost:8000/", part:"Kevin/db", cache_id: "card-cache"}).fetch();
+JsonLoader.getInst().checkVersion("version","Kevin/profile");
 ReactDOM.render(
   <Auth0Provider 
     domain={"visualsource.auth0.com"}
