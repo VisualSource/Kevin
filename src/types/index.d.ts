@@ -155,7 +155,6 @@ declare namespace KevinOnline{
         interface MainGameScene extends Phaser.Scene{
             graveyard_a;
             graveyard_b;
-            settings: Settings;
             worker: QueryableWorker;
             player_hand: Hand;
             opponent_hand: Hand;
@@ -242,6 +241,7 @@ declare namespace KevinOnline{
     interface CardData{
         index: number;
         name: string;
+        type: string;
         class: CardClass;
         rarity: CardRarity;
         special: boolean;
@@ -285,11 +285,7 @@ declare namespace KevinOnline{
         }
     }
 
-    interface Settings{
-        uuid: string;
-        online: boolean;
-        debug: boolean;
-    }
+
     interface QueryableWorker{
         private workerInstance: Worker;
         private listeners: {[name: string]: Function};

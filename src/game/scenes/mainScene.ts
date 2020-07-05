@@ -8,10 +8,7 @@ import GameState from '../state/GameState';
 import {CardDeckMannager} from '../utils/Loader';
 import QueryableWorker from '../state/OpponentHander';
 
-import SceneWatcherPlugin from 'phaser-plugin-scene-watcher'
-import PhaserGUIAction from 'phaser3_gui_inspector';
 export default class GameScene extends Scene implements KevinOnline.Objects.MainGameScene{
-    settings: KevinOnline.Settings = { uuid: "", online: false, debug: false}
     gameState = GameState.getInstance();
     cardManager = CardDeckMannager.getInstance();
     worker = QueryableWorker.getInstance();
@@ -27,12 +24,7 @@ export default class GameScene extends Scene implements KevinOnline.Objects.Main
         super("main");
     }
     init(data: any){
-        this.settings.uuid = data.settings.uuid;
-        this.settings.online = data.settings.online as any === "true" ? true : false;
-        if(this.settings.debug){
-            this.plugins.install("SceneWatcher",SceneWatcherPlugin, true);
-            PhaserGUIAction(this);
-        }
+        this.worker.send("client_ready",{});
     }
     preload(){
         this.gameState.OverlayProxy.show = true;

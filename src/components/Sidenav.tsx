@@ -38,7 +38,9 @@ const tabIcons = [
 export default function Sidenav(props: {activeTab: number}){
     const [version, setVersion] = useState("");
     useEffect(()=>{
-        LocalStorage.read<{ version: string, for: string}>("version").then(data=>setVersion(data.for))
+        LocalStorage.read<{ version: string, for: string}>("version").then(data=>setVersion(data.for)).catch((err=>{
+            setVersion("client-x.x.x-?")
+        }));
     },[]);
     return <nav id="side-nav">
                 <header>

@@ -1,8 +1,144 @@
 import React,{useState, useEffect, createRef} from 'react';
-import {Button, Select, Input, Card, Tag, Modal, Rule} from 'shineout';
+import * as JsSearch from 'js-search';
+import {Button, Select, Input, Card, Tag, Modal, Rule,CardGroup, Spin} from 'shineout';
 import {JsonLoader} from '@visualsource/vs_api';
 import {init, event} from './viewer';
 import { routeTo } from '../../utils/history';
+
+function Item({  name }:KevinOnline.CardData) {
+    return (
+      <div style={{ padding: 20 }}>
+        <div>
+          <div style={{ width: 40, height: 40, display: 'inline-flex', borderRadius: '50%', background: '#99A3A4' }}>
+            
+          </div>
+          <span style={{ marginLeft: 12, fontSize: 16, fontWeight: 500, color: 'rgba(51,62,89,1)' }}>{name}</span>
+        </div>
+        <p style={{ margin: '20px 0', fontSize: 14, color: 'rgba(153,157,168,1)' }}>
+          Add or delete tag for your customer. You can sort your customer...
+        </p>
+        <div style={{ color: 'rgba(102,108,124,1)' }}>
+          
+          Add This
+        </div>
+      </div>
+    )
+  }
+const rule = Rule();
+const placeholder = (
+    <div style={{ width: '100%', height: 200, display: 'flex' }}>
+      <Spin style={{ margin: 'auto' }} />
+    </div>
+  )
+const errorCard: KevinOnline.CardData =  {
+    index:0,
+    name:"Load Error",
+    type:"",
+    class:"Obelisk",
+    rarity:"Common",
+    special: false,
+    visual:{
+        front_texture:"pyro_kevin",
+        back_texture:"default"
+    },
+    attack:{
+        damage: 0,
+        mana_cost:0,
+        can_attack_player: true,
+        can_attack_cards: true,
+        damage_type:"basic",
+        status_length: 0,
+        attack_particle:"",
+        sound_cue_attack:""
+    },
+    health:{
+        health: 0,
+        life_expectancy: 0,
+        death_particle: "",
+        sound_cue_death:""
+    },
+    abilities:[ ],
+    description:"",
+    placement_settings:{
+        owner:"self",
+        mana_cost: 0,
+        entry_particle:"",
+        sound_cue_entry:""
+    },
+    deck_settings:{
+        unlocked: true,
+        add_to_player_deck: true,
+        max_num_in_deck: 0,
+        weight: 0,
+        screen_size:{
+            x:200,
+            y: 280
+        }
+    }
+}
+const search = new JsSearch.Search("index");
+search.addIndex("name");
+search.addIndex("type");
+search.addIndex("class");
+search.addIndex("rarity");
+search.addIndex("description");
+let carddefault : KevinOnline.CardData[] = [];
+export default function DeckEditor(){
+    const [cardList, setCardList] = useState<KevinOnline.CardData[]>([]);
+    useEffect(()=>{
+        JsonLoader.getInst()
+        .fetch<{cards: KevinOnline.CardData[]}>()
+        .then(value=>{
+            setCardList(value.cards);
+            carddefault = value.cards;
+            search.addDocuments(value.cards);
+        })
+        .catch(err=>{});
+       
+    },[]);
+    return <div id="editor">
+        <section id="card-viewer">
+            <Button>Exit</Button>
+            <canvas></canvas>
+        </section>
+        <section id="card-selection">
+            <div id="card-list">
+            <Input.Group>
+                <Input placeholder="search text" onEnterPress={(value: string)=>{
+                        if(value === "") {
+                            setCardList(carddefault);
+                        }else{
+                            setCardList(search.search(value) as KevinOnline.CardData[]);
+                        }
+                }}/>
+                <Button type="primary">Search</Button>
+            </Input.Group>
+            <CardGroup height={300} columns={2}>
+                    {cardList.map(v => (
+                        <CardGroup.Item key={v.name} placeholder={placeholder} checked={false}>
+                            <Item {...v} />
+                        </CardGroup.Item>
+                    ))}
+            </CardGroup>
+            </div>
+            <nav id="deck-builder">
+                <Input.Group>
+                    <Input placeholder="deck name" onEnterPress={(value: string)=>{}}/>
+                    <Button type="primary">Save</Button>
+                </Input.Group>
+                <CardGroup height={300} columns={1}>
+                        <CardGroup.Item key={"d"}>
+                            <Tag onClose={() => console.log('I am close')} onClick={() => console.log('I am click')}>
+                                Tag 3
+                            </Tag>
+                        </CardGroup.Item>
+                </CardGroup>
+            </nav>
+        </section>
+    </div>
+}
+
+/*
 
 interface IDeck{
     id: number;
@@ -141,3 +277,4 @@ export default function DeckEditor(){
           </div>;
 }
 
+*/

@@ -14,12 +14,15 @@ export default class GameState{
     public worker: QueryableWorker = QueryableWorker.getInstance();
     self = observe({health: 30, mana: 2000, turns: 0});
     opponent = observe({health: 30, mana: 1, turns: 0});
-    showOverlay = observe({show: false, turnOwner: "self"});
+    showOverlay = observe({show: false, turnOwner: "self", wating: true});
     constructor(){
         this.worker.addListeners("turn_change",()=>{
             if(this.OverlayProxy.turnOwner !== "self"){
                 this.nextTurn();
             }
+        });
+        this.worker.addListeners("opponent_ready",()=>{
+            this.showOverlay.proxy.wating  = false;
         });
     }
     get selfProxy(){

@@ -1,0 +1,28 @@
+#editor 
+    display: flex
+    flex-wrap: nowrap
+    height: 100vh
+    > #card-selection
+        width: 50vw
+        display: flex
+        flex-wrap: nowrap
+        > #card-list
+            width: auto
+            flex-grow: 1
+            display: flex
+            flex-direction: column
+            > div.so-card-group 
+                flex-grow: 1
+        > nav#deck-builder
+            width: 13rem
+            background: #43425D
+            
+    > #card-viewer
+        width: 50vw
+        > button.so-button.so-button-default
+            position: absolute 
+            top: 2rem
+            left: 2rem 
+        > canvas
+            background: #F1F8FE
+            width: inherit

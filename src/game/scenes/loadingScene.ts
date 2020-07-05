@@ -68,7 +68,6 @@ export default class LoadingScene extends Scene{
         this.add.image(window.innerWidth/2,window.innerHeight/2, "logo").setScale(0.5).setOrigin(0.5);
         this.cardManager.fetchOpponentDeck().then(()=>{
             this.scene.start("main");
-            QueryableWorker.getInstance().send("ready",{});
         });
     }
 

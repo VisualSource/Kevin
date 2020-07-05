@@ -1,14 +1,18 @@
 importScripts("./core.js", "https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js");
 const socket = io("http://localhost:8000/kevin");
-const { Events, EventHandler, reply, errorReply } = Core;
+const { Events, EventHandler, reply, errorReply, clientID } = Core;
 const coreHandler = new EventHandler();
 self.onmessage = event => coreHandler.emit(event.data.name, event.data.data);
 const config = {
     uuid: null,
     type: "SOCKET.IO",
-    opponet_id: ""
+    opponet_id: "",
+    client: clientID()
 };
-socket.on("connect", event => reply(Events.WEBSOCKET_READY, { system: config.type }));
+socket.on("connect", event => {
+    socket.emit("login", { id: config.client });
+    reply(Events.WEBSOCKET_READY, { system: config.type });
+});
 socket.on("connect_error", (event) => errorReply("connect_error", event));
 socket.on("connect_timeout", (event) => errorReply("connect_timeout", event));
 socket.on("reconnect", (event) => { });
