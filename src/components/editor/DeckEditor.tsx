@@ -1,81 +1,19 @@
-import React,{useState, useEffect, createRef} from 'react';
+import React,{useState, useEffect, createRef, useReducer} from 'react';
 import * as JsSearch from 'js-search';
-import {Button, Select, Input, Card, Tag, Modal, Rule,CardGroup, Spin} from 'shineout';
+import {Button, Select, Input, Card, Tag, Modal, Rule,CardGroup, Spin, Form} from 'shineout';
 import {JsonLoader} from '@visualsource/vs_api';
 import {init, event} from './viewer';
 import { routeTo } from '../../utils/history';
+import { count } from 'console';
 
-function Item({  name }:KevinOnline.CardData) {
-    return (
-      <div style={{ padding: 20 }}>
-        <div>
-          <div style={{ width: 40, height: 40, display: 'inline-flex', borderRadius: '50%', background: '#99A3A4' }}>
-            
-          </div>
-          <span style={{ marginLeft: 12, fontSize: 16, fontWeight: 500, color: 'rgba(51,62,89,1)' }}>{name}</span>
-        </div>
-        <p style={{ margin: '20px 0', fontSize: 14, color: 'rgba(153,157,168,1)' }}>
-          Add or delete tag for your customer. You can sort your customer...
-        </p>
-        <div style={{ color: 'rgba(102,108,124,1)' }}>
-          
-          Add This
-        </div>
-      </div>
-    )
-  }
-const rule = Rule();
+
+
+
 const placeholder = (
     <div style={{ width: '100%', height: 200, display: 'flex' }}>
       <Spin style={{ margin: 'auto' }} />
     </div>
-  )
-const errorCard: KevinOnline.CardData =  {
-    index:0,
-    name:"Load Error",
-    type:"",
-    class:"Obelisk",
-    rarity:"Common",
-    special: false,
-    visual:{
-        front_texture:"pyro_kevin",
-        back_texture:"default"
-    },
-    attack:{
-        damage: 0,
-        mana_cost:0,
-        can_attack_player: true,
-        can_attack_cards: true,
-        damage_type:"basic",
-        status_length: 0,
-        attack_particle:"",
-        sound_cue_attack:""
-    },
-    health:{
-        health: 0,
-        life_expectancy: 0,
-        death_particle: "",
-        sound_cue_death:""
-    },
-    abilities:[ ],
-    description:"",
-    placement_settings:{
-        owner:"self",
-        mana_cost: 0,
-        entry_particle:"",
-        sound_cue_entry:""
-    },
-    deck_settings:{
-        unlocked: true,
-        add_to_player_deck: true,
-        max_num_in_deck: 0,
-        weight: 0,
-        screen_size:{
-            x:200,
-            y: 280
-        }
-    }
-}
+  );
 const search = new JsSearch.Search("index");
 search.addIndex("name");
 search.addIndex("type");
@@ -83,8 +21,50 @@ search.addIndex("class");
 search.addIndex("rarity");
 search.addIndex("description");
 let carddefault : KevinOnline.CardData[] = [];
+
+interface IdeckListState{
+    id: number;
+    amount: number;
+    name: string;
+}
+function deckListReducer(state: {deck: IdeckListState[], count: number}, action: { type: string, data: IdeckListState}){
+    switch (action.type) {
+        case "add":{
+            if(state.count < 50){
+                const card = state.deck.findIndex(value=>value.id === action.data.id);
+                if(card !== -1){
+                    if(carddefault[action.data.id].deck_settings.max_num_in_deck > state.deck[card].amount){
+                        state.deck[card].amount++ 
+                        state.count++
+                    }
+                }else{
+                    state.deck.push({ name: action.data.name, id: action.data.id, amount: 1});
+                    state.count ++;
+                }
+            }
+            return { count: state.count, deck: state.deck};
+        }
+        case "remove":{
+            if(state.count < 50){
+                const card = state.deck.findIndex(value=>value.id === action.data.id);
+                if(card !== -1){
+                    state.deck[card].amount = state.deck[card].amount - action.data.amount;
+                    state.count = state.count - action.data.amount;
+                    if(state.deck[card].amount < 1) state.deck.splice(card, 1);
+                }
+            }
+            return { count: state.count, deck: state.deck};
+        }
+        case "reset":
+            return { count: 0, deck: []}
+        default:
+            return state;
+    }
+}
 export default function DeckEditor(){
+    const [modala, setModalA] = useState(false);
     const [cardList, setCardList] = useState<KevinOnline.CardData[]>([]);
+    const [deckList, dispatchDeck] = useReducer<(state: {deck: IdeckListState[], count: number}, action: {type: string; data: IdeckListState})=>{deck: IdeckListState[], count: number}>(deckListReducer, {deck: [{id:0,amount:1,name:"Pyromic Kevin"}], count: 1});
     useEffect(()=>{
         JsonLoader.getInst()
         .fetch<{cards: KevinOnline.CardData[]}>()
@@ -94,45 +74,79 @@ export default function DeckEditor(){
             search.addDocuments(value.cards);
         })
         .catch(err=>{});
-       
     },[]);
     return <div id="editor">
+        <Modal title="Select Deck to edit" visible={modala} onClose={()=>setModalA(false)}>
+               <div id="deck-load">
+                    <Select keygen style={{ width: 240 }} data={[]} placeholder="Select Deck"/>
+                    <Button>Load</Button>
+               </div>
+        </Modal>
+        <Modal title="Save Deck?" visible={false}></Modal>
         <section id="card-viewer">
             <Button>Exit</Button>
             <canvas></canvas>
         </section>
         <section id="card-selection">
             <div id="card-list">
-            <Input.Group>
-                <Input placeholder="search text" onEnterPress={(value: string)=>{
-                        if(value === "") {
-                            setCardList(carddefault);
-                        }else{
-                            setCardList(search.search(value) as KevinOnline.CardData[]);
-                        }
-                }}/>
-                <Button type="primary">Search</Button>
-            </Input.Group>
+            <div id="card-settings">
+                <Input.Group>
+                    <Input placeholder="search text" onEnterPress={(value: string)=>{
+                            if(value === "") {
+                                setCardList(carddefault);
+                            }else{
+                                setCardList(search.search(value) as KevinOnline.CardData[]);
+                            }
+                    }}/>
+                    <Button type="primary">Search</Button>
+                </Input.Group>
+                <Button.Group outline type="primary">
+                    <Button>Save</Button>
+                    <Button onClick={()=>setModalA(true)}>Load</Button>
+                    <Button onClick={()=>dispatchDeck({type:"reset", data:{id:0, amount:0, name:""}})}>Reset</Button>
+                </Button.Group>
+            </div>
             <CardGroup height={300} columns={2}>
                     {cardList.map(v => (
                         <CardGroup.Item key={v.name} placeholder={placeholder} checked={false}>
-                            <Item {...v} />
+                             <div style={{ padding: 20 }}>
+                                <div>
+                                    <div style={{ width: 40, height: 40, display: 'inline-flex', borderRadius: '50%', background: '#99A3A4' }}>
+                                        
+                                    </div>
+                                    <span style={{ marginLeft: 12, fontSize: 16, fontWeight: 500, color: 'rgba(51,62,89,1)' }}>{v.name}</span>
+                                    </div>
+                                    <p style={{ margin: '20px 0', fontSize: 14, color: 'rgba(153,157,168,1)' }}>
+                                    Add or delete tag for your customer. You can sort your customer...
+                                    </p>
+                                    <Button type="link" onClick={()=>dispatchDeck({type:"add", data: {name: v.name, id: v.index, amount:1}})}>Add To Deck</Button>
+                            </div>
                         </CardGroup.Item>
                     ))}
             </CardGroup>
             </div>
             <nav id="deck-builder">
                 <Input.Group>
-                    <Input placeholder="deck name" onEnterPress={(value: string)=>{}}/>
+                    <Input placeholder="deck name" onEnterPress={(value: string)=>{
+                        console.log(value);
+                    }}/>
                     <Button type="primary">Save</Button>
                 </Input.Group>
-                <CardGroup height={300} columns={1}>
-                        <CardGroup.Item key={"d"}>
-                            <Tag onClose={() => console.log('I am close')} onClick={() => console.log('I am click')}>
-                                Tag 3
-                            </Tag>
-                        </CardGroup.Item>
+                <CardGroup height={500} columns={1} gap={5}>
+                        {
+                            deckList.deck.map(value=>{
+                                return <CardGroup.Item key={value.id}>
+                                    <Tag onClose={() => dispatchDeck({type:"remove", data: {id: value.id, name: value.name, amount:value.amount}})} onClick={() => console.log('I am click')}>
+                                       {`${value.amount} ${value.name}`}
+                                    </Tag>
+                                </CardGroup.Item>
+                            })
+                        }
+
                 </CardGroup>
+                <div>
+                    <p>{`${deckList.count} of 50`}</p>
+                </div>
             </nav>
         </section>
     </div>
