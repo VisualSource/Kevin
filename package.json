@@ -55,6 +55,6 @@
     "node-sass": "^4.14.1",
     "phaser-plugin-scene-watcher": "^4.2.0",
     "phaser3_gui_inspector": "^1.1.4",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.7"
   }
 }
